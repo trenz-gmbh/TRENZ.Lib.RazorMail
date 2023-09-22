@@ -6,7 +6,7 @@
 
     <Nullable>enable</Nullable>
 
-    <RootNamespace>EL.Lib.RazorMail</RootNamespace>
+    <RootNamespace>TRENZ.Lib.RazorMail</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

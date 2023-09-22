@@ -1,4 +1,4 @@
-﻿namespace EL.Lib.RazorMail.Models;
+﻿namespace TRENZ.Lib.RazorMail.Models;
 
 public record SmtpAccount(string Host, int Port,
                           bool TLS,

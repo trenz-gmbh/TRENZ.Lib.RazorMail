@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace EL.Lib.RazorMail.SystemNetMailExtensions;
+namespace TRENZ.Lib.RazorMail.Extensions;
 
 public static class SmtpClientExtensions
 {
