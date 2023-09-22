@@ -55,7 +55,7 @@ The library currently contains providers for sending via the classic System.Net.
 
 To wrap it all up:
 
-```
+```csharp
 const string view = "Sample";
 // this is your model. If you're sending to multiple people, you may want to customize this per person.
 var model = new SampleModel(request.Salutation);
