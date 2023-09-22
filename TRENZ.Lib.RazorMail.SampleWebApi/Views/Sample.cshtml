@@ -1,0 +1,18 @@
+@using TRENZ.Lib.RazorMail.SampleWebApi.Models
+
+@inherits TRENZ.Lib.RazorMail.Core.MailTemplateBase<SampleModel>
+
+@{
+    Subject = "Greetings!";
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title></title>
+</head>
+<body>
+    <h1>@Model.Salutation!</h1>
+</body>
+</html>
