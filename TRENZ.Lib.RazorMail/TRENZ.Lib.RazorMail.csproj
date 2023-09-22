@@ -5,6 +5,8 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 
     <Nullable>enable</Nullable>
+
+    <RootNamespace>EL.Lib.RazorMail</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
