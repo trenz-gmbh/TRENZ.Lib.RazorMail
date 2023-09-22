@@ -53,7 +53,7 @@ Or, to attach a file:
 
 ```cshtml
 @{
-    AttachFile("Invoice.pdf", someByteArray)");
+    AttachFile("Invoice.pdf", someByteArray);
 }
 ```
 
