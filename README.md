@@ -49,6 +49,16 @@ For example, to show an image inline, you simply do:
 
 That's it. This attaches the image as a file, then references it using `cid` format. Because the image is attached, this also doesn't require your users to enable loading external images.
 
+Or, to attach a file:
+
+```cshtml
+@{
+    AttachFile("Invoice.pdf", someByteArray)");
+}
+```
+
+(Because file attachments don't relate to the body, you probably want to put this near the `Subject`.)
+
 ## Sending
 
 The library currently contains providers for sending via the classic System.Net.Mail, or via SmtpKit.
