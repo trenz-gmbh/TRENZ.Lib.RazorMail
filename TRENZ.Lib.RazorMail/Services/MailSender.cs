@@ -86,10 +86,6 @@ public class MailSender
                 foreach (var item in Bcc)
                     mail.Bcc.Add((System.Net.Mail.MailAddress)item);
 
-                if (!System.Diagnostics.Debugger.IsAttached)
-                    // sich selbst als BCC, damit es im Postfach landet
-                    mail.Bcc.Add(From);
-
                 foreach (var item in Attachments)
                     mail.Attachments.Add(item);
 
@@ -145,10 +141,6 @@ public class MailSender
 
             foreach (var item in Bcc)
                 mail.Bcc.Add(item.ToMailboxAddress());
-
-            //                if (!System.Diagnostics.Debugger.IsAttached)
-            // sich selbst als BCC, damit es im Postfach landet
-            mail.Bcc.Add(From.ToMailboxAddress());
 
             _Log.Info(
                 $"Sending mail from {mail.From} to {string.Join(", ", mail.To)}, cc {string.Join(", ", mail.Cc)}, bcc {string.Join(", ", mail.Bcc)}");
