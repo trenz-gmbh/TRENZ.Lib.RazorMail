@@ -1,11 +1,8 @@
-using TRENZ.Lib.RazorMail.Services;
+using TRENZ.Lib.RazorMail.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMvcCore()
-                .AddRazorViewEngine();
-
-builder.Services.AddTransient<IRazorEmailRenderer, RazorEmailRenderer>();
+builder.Services.AddRazorEmailRenderer();
 
 var app = builder.Build();
 
