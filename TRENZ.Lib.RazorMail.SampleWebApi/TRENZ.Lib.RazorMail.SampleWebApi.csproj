@@ -4,6 +4,9 @@
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+
+        <MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
+        <RazorCompileOnBuild>false</RazorCompileOnBuild>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,7 +14,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="Views\Sample.cshtml" />
+      <Content Update="Mails\Sample.cshtml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

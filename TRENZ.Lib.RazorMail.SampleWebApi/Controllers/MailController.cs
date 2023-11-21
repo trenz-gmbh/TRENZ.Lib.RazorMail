@@ -25,7 +25,7 @@ public class MailController : ControllerBase
     [Route("[controller]/[action]")]
     public async Task<IActionResult> SendSampleMail([FromBody] SendSampleMailRequest request)
     {
-        const string view = "Sample";
+        const string view = "Mails/Sample.cshtml";
         var model = new SampleModel(request.Salutation);
         var renderedMail = await EmailRenderer.RenderAsync(view, model);
 

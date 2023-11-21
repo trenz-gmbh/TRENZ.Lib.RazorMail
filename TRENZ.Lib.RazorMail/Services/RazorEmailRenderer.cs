@@ -1,103 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Routing;
+using RazorEngineCore;
 
 using TRENZ.Lib.RazorMail.Models;
 
 namespace TRENZ.Lib.RazorMail.Services;
 
-/// <summary>
-/// via https://scottsauber.com/2018/07/07/walkthrough-creating-an-html-email-template-with-razor-and-razor-class-libraries-and-rendering-it-from-a-net-standard-class-library/
-/// </summary>
 public class RazorEmailRenderer : IRazorEmailRenderer
 {
-    private IRazorViewEngine _viewEngine;
-    private ITempDataProvider _tempDataProvider;
-    private IServiceProvider _serviceProvider;
-    readonly IWebHostEnvironment _Environment;
-
-    public RazorEmailRenderer(IRazorViewEngine viewEngine,
-        ITempDataProvider tempDataProvider,
-        IServiceProvider serviceProvider,
-        IWebHostEnvironment environment)
+    /// <inheritdoc />
+    public async Task<RenderedMail> RenderAsync<TModel, TTemplate>(string viewName, TModel model, CancellationToken cancellationToken = default) where TTemplate : RazorEngineTemplateBase<TModel>
     {
-        _viewEngine = viewEngine;
-        _tempDataProvider = tempDataProvider;
-        _serviceProvider = serviceProvider;
-        _Environment = environment;
-    }
-
-    public async Task<RenderedMail> RenderAsync<TModel>(string viewName, TModel model)
-    {
-        var actionContext = GetActionContext();
-        var view = FindView(actionContext, viewName);
-
-        using (var output = new StringWriter())
+        var engine = new RazorEngine();
+        var templateSource = await GetTemplateSourceAsync(viewName);
+        var template = await engine.CompileAsync<TTemplate>(templateSource, cancellationToken: cancellationToken);
+        var result = await template.RunAsync(t =>
         {
-            var viewData = new ViewDataDictionary<TModel>(new EmptyModelMetadataProvider(), new ModelStateDictionary())
-                { Model = model };
+            t.Model = model;
+        });
 
-            var tempData = new TempDataDictionary(actionContext.HttpContext, _tempDataProvider);
-            tempData["ContentRootPath"] = this._Environment.ContentRootPath;
-
-            var htmlHelperOptions = new HtmlHelperOptions();
-
-            var viewContext = new ViewContext(actionContext, view, viewData, tempData, output, htmlHelperOptions);
-
-            await view.RenderAsync(viewContext);
-
-            return new RenderedMail(subject: viewContext.ViewData["Subject"] as string,
-                htmlBody: output.ToString(),
-                attachments: viewContext.ViewData["Attachments"] as Dictionary<string, MailAttachment>);
-        }
+        return new RenderedMail(null, result ?? "", null);
     }
 
-    private IView FindView(ActionContext actionContext, string viewName)
+    private static Task<string> GetTemplateSourceAsync(string templateName)
     {
-        var getViewResult = _viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: true);
-        if (getViewResult.Success)
-        {
-            return getViewResult.View;
-        }
-
-        var findViewResult = _viewEngine.FindView(actionContext, viewName, isMainPage: true);
-        if (findViewResult.Success)
-        {
-            return findViewResult.View;
-        }
-
-        var searchedLocations = getViewResult.SearchedLocations.Concat(findViewResult.SearchedLocations);
-        var errorMessage = string.Join(
-            Environment.NewLine,
-            new[] { $"Unable to find view '{viewName}'. The following locations were searched:" }.Concat(
-                searchedLocations));
-        ;
-
-        throw new InvalidOperationException(errorMessage);
+        return File.ReadAllTextAsync(templateName);
     }
-
-    private ActionContext GetActionContext()
-    {
-        var httpContext = new DefaultHttpContext();
-        httpContext.RequestServices = _serviceProvider;
-        return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-    }
-}
-
-public interface IRazorEmailRenderer
-{
-    Task<RenderedMail> RenderAsync<TModel>(string viewName, TModel model);
 }

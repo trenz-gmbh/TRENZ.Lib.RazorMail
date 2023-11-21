@@ -1,8 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 
     <Nullable>enable</Nullable>
 
@@ -10,12 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="MailKit" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
     <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="RazorEngineCore" Version="2023.11.2" />
   </ItemGroup>
 
 </Project>
