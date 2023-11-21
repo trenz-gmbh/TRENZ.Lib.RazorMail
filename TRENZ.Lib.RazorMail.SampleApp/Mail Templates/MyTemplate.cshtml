@@ -1,0 +1,16 @@
+@inherits EL.Lib.RazorMail.Core.MailTemplateBase<MyModel>
+
+@{
+    Subject = "Greetings!";
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title></title>
+</head>
+<body>
+    <h1>Hello @model.Name</h1>
+</body>
+</html>
