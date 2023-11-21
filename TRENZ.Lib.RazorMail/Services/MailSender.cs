@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 using MailKit.Net.Smtp;
 
-using MimeKit;
+using Microsoft.Extensions.Logging;
 
-using NLog;
+using MimeKit;
 
 using TRENZ.Lib.RazorMail.Extensions;
 using TRENZ.Lib.RazorMail.Models;
@@ -16,21 +16,23 @@ namespace TRENZ.Lib.RazorMail.Services;
 
 public class MailSender
 {
-    private static Logger _Log = LogManager.GetCurrentClassLogger();
+    private readonly ILogger<MailSender> logger;
 
     // TODO: this isn't very useful yet; need support for includes/hierachy
     public List<string> HtmlBodies { get; private set; }
     public List<MailAttachment> Attachments { get; private set; }
 
-    private MailSender(MailAddress from)
+    private MailSender(MailAddress from, ILogger<MailSender> logger)
     {
         HtmlBodies = new List<string>();
         Attachments = new List<MailAttachment>();
         From = from;
+
+        this.logger = logger;
     }
 
-    public MailSender(MailAddress from, List<MailAddress> to, RenderedMail renderedMail)
-        : this(from)
+    public MailSender(MailAddress from, List<MailAddress> to, RenderedMail renderedMail, ILogger<MailSender> logger)
+        : this(from, logger)
     {
         To.AddRange(to);
 
@@ -93,11 +95,11 @@ public class MailSender
                 foreach (var item in Attachments)
                     mail.Attachments.Add(item);
 
-                _Log.Info($"Sending mail from {From} to {string.Join(", ", mail.To)}");
+                logger.LogInformation("Sending mail from {From} to {To}", From, string.Join(", ", mail.To));
 
-                _Log.Info($"{nameof(mail.Subject)}: {mail.Subject}");
+                logger.LogInformation("{SubjectName}: {Subject}", nameof(mail.Subject), mail.Subject);
 
-                _Log.Debug(mail.Body);
+                logger.LogDebug("{BodyName}: {Body}", nameof(mail.Body), mail.Body);
 
                 await client.SendAsync(mail);
             }
@@ -150,12 +152,11 @@ public class MailSender
             // sich selbst als BCC, damit es im Postfach landet
             mail.Bcc.Add(From.ToMailboxAddress());
 
-            _Log.Info(
-                $"Sending mail from {mail.From} to {string.Join(", ", mail.To)}, cc {string.Join(", ", mail.Cc)}, bcc {string.Join(", ", mail.Bcc)}");
+            logger.LogInformation("Sending mail from {From} to {To}, cc {ToCc}, bcc {ToBcc}", mail.From, string.Join(", ", mail.To), string.Join(", ", mail.Cc), string.Join(", ", mail.Bcc));
 
-            _Log.Info($"{nameof(mail.Subject)}: {mail.Subject}");
+            logger.LogInformation("{SubjectName}: {Subject}", nameof(mail.Subject), mail.Subject);
 
-            _Log.Debug(mail.Body);
+            logger.LogDebug("{BodyName}: {Body}", nameof(mail.Body), mail.Body);
 
             var formatOptions = FormatOptions.Default.Clone();
 
