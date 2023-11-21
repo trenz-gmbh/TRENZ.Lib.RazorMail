@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 
@@ -10,7 +11,7 @@ using TRENZ.Lib.RazorMail.Models;
 
 namespace TRENZ.Lib.RazorMail.Core;
 
-public abstract class MailTemplateBase<T> : RazorPage<T>
+public abstract class MailTemplateBase<T> : ComponentBase
 {
     public Dictionary<string, MailAttachment> Attachments
     {
@@ -33,19 +34,19 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
         set => this.ViewData["Subject"] = value;
     }
 
-    public string InlineFile(string filename)
-        => _AttachFile(filename, new ContentDisposition(ContentDisposition.Inline));
+    public string InlineFile(string filename, string contentType)
+        => _AttachFile(filename, contentType, new ContentDisposition(ContentDisposition.Inline));
 
-    public void AttachFile(string filename)
-        => _AttachFile(filename, new ContentDisposition(ContentDisposition.Attachment));
+    public void AttachFile(string filename, string contentType)
+        => _AttachFile(filename, contentType, new ContentDisposition(ContentDisposition.Attachment));
 
-    public string InlineFile(string filename, byte[] fileData)
-        => _AttachFile(filename, fileData, new ContentDisposition(ContentDisposition.Inline));
+    public string InlineFile(string filename, string contentType, byte[] fileData)
+        => _AttachFile(filename, contentType, fileData, new ContentDisposition(ContentDisposition.Inline));
 
-    public void AttachFile(string filename, byte[] fileData)
-        => _AttachFile(filename, fileData, new ContentDisposition(ContentDisposition.Attachment));
+    public void AttachFile(string filename, string contentType, byte[] fileData)
+        => _AttachFile(filename, contentType, fileData, new ContentDisposition(ContentDisposition.Attachment));
 
-    private string _AttachFile(string filename, ContentDisposition contentDisposition)
+    private string _AttachFile(string filename, string contentType, ContentDisposition contentDisposition)
     {
         var contentRootPath = TempData["ContentRootPath"] as string ??
                               throw new InvalidOperationException(nameof(TempData));
@@ -56,14 +57,11 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
 
         var absolutePath = System.IO.Path.Combine(contentRootPath, parentDir, filename);
 
-        return _AttachFile(filename, System.IO.File.ReadAllBytes(absolutePath), contentDisposition);
+        return _AttachFile(filename, contentType, System.IO.File.ReadAllBytes(absolutePath), contentDisposition);
     }
 
-    private string _AttachFile(string filename, byte[] fileData, ContentDisposition contentDisposition)
+    private string _AttachFile(string filename, string contentType, byte[] fileData, ContentDisposition contentDisposition)
     {
-        if (!new FileExtensionContentTypeProvider().TryGetContentType(filename, out var contentType))
-            throw new NotSupportedException($"Couldn't figure out content type for {filename}");
-
         if (!Attachments.ContainsKey(filename))
         {
             var attachment = new MailAttachment(fileData, filename, contentType);

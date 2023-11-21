@@ -8,9 +8,6 @@ public static class RazorMailServiceCollectionExtensions
 {
     public static IServiceCollection AddRazorEmailRenderer(this IServiceCollection services)
     {
-        services.AddMvcCore()
-                .AddRazorViewEngine();
-
         services.AddTransient<IRazorEmailRenderer, RazorEmailRenderer>();
 
         return services;
