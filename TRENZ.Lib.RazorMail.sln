@@ -5,6 +5,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{7D436ED8-6498-4D5F-991C-C7CFD90242CA}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		docker-compose.yml = docker-compose.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.SampleWebApi", "TRENZ.Lib.RazorMail.SampleWebApi\TRENZ.Lib.RazorMail.SampleWebApi.csproj", "{3B4E6149-BD59-48A5-A4A5-68293CE9FD71}"

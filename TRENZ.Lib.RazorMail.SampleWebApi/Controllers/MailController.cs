@@ -11,10 +11,13 @@ public class MailController : ControllerBase
     public IRazorEmailRenderer EmailRenderer { get; }
     public SmtpAccount SmtpAccount { get; }
 
+    public ILoggerFactory LoggerFactory { get; }
+
     public MailController(IRazorEmailRenderer emailRenderer,
-        IConfiguration configuration)
+        IConfiguration configuration, ILoggerFactory loggerFactory)
     {
         EmailRenderer = emailRenderer;
+        LoggerFactory = loggerFactory;
         SmtpAccount = configuration.GetSection("SmtpAccount").Get<SmtpAccount>();
     }
 
@@ -28,7 +31,7 @@ public class MailController : ControllerBase
 
         var mail = new MailSender(from: request.From,
             to: new[] { (MailAddress)request.To }.ToList(),
-            renderedMail);
+            renderedMail, LoggerFactory.CreateLogger<MailSender>());
 
         await mail.SendViaSystemNetMailAsync(SmtpAccount);
 
