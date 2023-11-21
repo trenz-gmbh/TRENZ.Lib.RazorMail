@@ -1,0 +1,8 @@
+POST https://localhost:7141/mail/sendsamplemail
+Content-Type: application/json
+
+{
+  "from": "foo@example.com",
+  "to": "bar@example.com",
+  "salutation": "Dear Bar"
+}
