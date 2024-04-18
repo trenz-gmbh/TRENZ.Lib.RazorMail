@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 
-using MimeKit;
-
 using TRENZ.Lib.RazorMail.Models;
 
 namespace TRENZ.Lib.RazorMail.Core;
@@ -34,16 +32,16 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
     }
 
     public string InlineFile(string filename)
-        => _AttachFile(filename, new ContentDisposition(ContentDisposition.Inline));
+        => _AttachFile(filename, ContentDisposition.Inline);
 
     public void AttachFile(string filename)
-        => _AttachFile(filename, new ContentDisposition(ContentDisposition.Attachment));
+        => _AttachFile(filename, ContentDisposition.Attachment);
 
     public string InlineFile(string filename, byte[] fileData)
-        => _AttachFile(filename, fileData, new ContentDisposition(ContentDisposition.Inline));
+        => _AttachFile(filename, fileData, ContentDisposition.Inline);
 
     public void AttachFile(string filename, byte[] fileData)
-        => _AttachFile(filename, fileData, new ContentDisposition(ContentDisposition.Attachment));
+        => _AttachFile(filename, fileData, ContentDisposition.Attachment);
 
     private string _AttachFile(string filename, ContentDisposition contentDisposition)
     {
@@ -68,7 +66,7 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
         {
             var attachment = new MailAttachment(fileData, filename, contentType);
 
-            switch (contentDisposition.Disposition)
+            switch (contentDisposition)
             {
                 case ContentDisposition.Inline:
                     attachment.ContentId = filename;
