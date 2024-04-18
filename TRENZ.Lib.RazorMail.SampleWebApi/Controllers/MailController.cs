@@ -30,7 +30,8 @@ public class MailController : ControllerBase
             to: new[] { (MailAddress)request.To }.ToList(),
             renderedMail);
 
-        await mail.SendViaSystemNetMailAsync(SmtpAccount);
+        await mail.SendViaMailKitAsync(SmtpAccount);
+        // await mail.SendViaSystemNetMailAsync(SmtpAccount);
 
         return Ok();
     }

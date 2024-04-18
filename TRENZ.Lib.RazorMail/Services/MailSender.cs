@@ -117,12 +117,12 @@ public class MailSender
 
             bodyBuilder.HtmlBody = HtmlBodies[0];
 
-            // CHECK content ID?
             foreach (var item in Attachments)
             {
                 var attachment =
                     bodyBuilder.Attachments.Add(item.Filename, item.FileData, ContentType.Parse(item.ContentType));
                 attachment.ContentId = item.ContentId;
+                attachment.IsAttachment = !item.Inline;
             }
 
             mail.Body = bodyBuilder.ToMessageBody();
