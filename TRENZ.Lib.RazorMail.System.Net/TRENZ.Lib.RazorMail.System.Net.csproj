@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>TRENZ.Lib.RazorMail</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TRENZ.Lib.RazorMail\TRENZ.Lib.RazorMail.csproj" />
+    </ItemGroup>
+
+</Project>

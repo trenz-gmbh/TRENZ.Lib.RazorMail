@@ -5,9 +5,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{7D436ED8-6498-4D5F-991C-C7CFD90242CA}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.SampleWebApi", "TRENZ.Lib.RazorMail.SampleWebApi\TRENZ.Lib.RazorMail.SampleWebApi.csproj", "{3B4E6149-BD59-48A5-A4A5-68293CE9FD71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.System.Net", "TRENZ.Lib.RazorMail.System.Net\TRENZ.Lib.RazorMail.System.Net.csproj", "{340DCC60-40BF-47E9-B8C3-D007DF2C4128}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.MailKit", "TRENZ.Lib.RazorMail.MailKit\TRENZ.Lib.RazorMail.MailKit.csproj", "{8F5F2E31-8A89-424A-B024-401905E2531D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,5 +28,13 @@ Global
 		{3B4E6149-BD59-48A5-A4A5-68293CE9FD71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B4E6149-BD59-48A5-A4A5-68293CE9FD71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B4E6149-BD59-48A5-A4A5-68293CE9FD71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{340DCC60-40BF-47E9-B8C3-D007DF2C4128}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{340DCC60-40BF-47E9-B8C3-D007DF2C4128}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{340DCC60-40BF-47E9-B8C3-D007DF2C4128}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{340DCC60-40BF-47E9-B8C3-D007DF2C4128}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F5F2E31-8A89-424A-B024-401905E2531D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F5F2E31-8A89-424A-B024-401905E2531D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F5F2E31-8A89-424A-B024-401905E2531D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F5F2E31-8A89-424A-B024-401905E2531D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

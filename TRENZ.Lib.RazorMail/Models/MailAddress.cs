@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 
-using MimeKit;
-
 using NUnit.Framework;
 
 namespace TRENZ.Lib.RazorMail.Models;
@@ -39,12 +37,6 @@ public class MailAddress
 
     public static implicit operator MailAddress(string address)
         => new MailAddress(address, "");
-
-    public static implicit operator System.Net.Mail.MailAddress(MailAddress address)
-        => new System.Net.Mail.MailAddress(address.Email, address.Name);
-
-    public MailboxAddress ToMailboxAddress()
-        => new MailboxAddress(Name, Email);
 
     public override string ToString()
     {

@@ -26,11 +26,11 @@ public class MailController : ControllerBase
         var model = new SampleModel(request.Salutation);
         var renderedMail = await EmailRenderer.RenderAsync(view, model);
 
-        var mail = new MailSender(from: request.From,
+        var mail = new MailKitMailSender(from: request.From,
             to: new[] { (MailAddress)request.To }.ToList(),
             renderedMail);
 
-        await mail.SendViaMailKitAsync(SmtpAccount);
+        await mail.SendAsync(SmtpAccount);
         // await mail.SendViaSystemNetMailAsync(SmtpAccount);
 
         return Ok();
