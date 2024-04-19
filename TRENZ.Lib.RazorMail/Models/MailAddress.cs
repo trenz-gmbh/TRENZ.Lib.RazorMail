@@ -57,22 +57,22 @@ public class MailAddressTests
     public void CtorWithAddress()
     {
         var address = new MailAddress(_EXPECTED_ADDRESS);
-        Assert.AreEqual(_EXPECTED_ADDRESS, address.Email);
+        Assert.That(_EXPECTED_ADDRESS, Is.EqualTo(address.Email));
     }
 
     [Test]
     public void CtorWithBoth()
     {
         var address = new MailAddress(_EXPECTED_ADDRESS, _EXPECTED_NAME);
-        Assert.AreEqual(_EXPECTED_ADDRESS, address.Email);
-        Assert.AreEqual(_EXPECTED_NAME, address.Name);
+        Assert.That(_EXPECTED_ADDRESS, Is.EqualTo(address.Email));
+        Assert.That(_EXPECTED_NAME, Is.EqualTo(address.Name));
     }
 
     [Test]
     public void CastFromString()
     {
         MailAddress address = _EXPECTED_ADDRESS;
-        Assert.AreEqual(_EXPECTED_ADDRESS, address.Email);
+        Assert.That(_EXPECTED_ADDRESS, Is.EqualTo(address.Email));
     }
 
     [Test]
@@ -80,7 +80,7 @@ public class MailAddressTests
     {
         var address = new MailAddress(_EXPECTED_ADDRESS);
         var addressAsString = (string)address;
-        Assert.AreEqual(_EXPECTED_ADDRESS, addressAsString);
+        Assert.That(_EXPECTED_ADDRESS, Is.EqualTo(addressAsString));
     }
 
     [Test]
