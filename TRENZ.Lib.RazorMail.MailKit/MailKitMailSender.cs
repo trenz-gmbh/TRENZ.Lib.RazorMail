@@ -49,7 +49,7 @@ public class MailKitMailSender : MailSender
 
         mail.Body = bodyBuilder.ToMessageBody();
 
-        // wird offenbar nicht genutzt
+        // TODO later version
         //if (replyTo != null)
         //    mail.ReplyToList.Add(replyTo);
 

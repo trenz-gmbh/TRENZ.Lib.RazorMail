@@ -34,7 +34,7 @@ public class SystemNetMailSender : MailSender
         mail.Subject = Subject;
         mail.Body = HtmlBodies[0];
 
-        // wird offenbar nicht genutzt
+        // TODO later version
         //if (replyTo != null)
         //    mail.ReplyToList.Add(replyTo);
 
