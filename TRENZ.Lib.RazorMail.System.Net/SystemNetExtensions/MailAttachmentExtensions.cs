@@ -12,7 +12,7 @@ public static class MailAttachmentExtensions
             attachment.ContentType);
 
         result.ContentId = attachment.ContentId;
-        result.ContentDisposition.Inline = attachment.Inline;
+        result.ContentDisposition!.Inline = attachment.Inline;
 
         return result;
     }
