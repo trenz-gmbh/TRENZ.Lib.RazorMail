@@ -39,7 +39,7 @@ public record SampleModel(string Salutation);
 
 Notice that:
 
-* we're passing `SampleModel` as our model type. It has a property `Saluation`, so we can then do `@Model.Salutation` to get its value.
+* we're passing `SampleModel` as our model type. It has a property `Salutation`, so we can then do `@Model.Salutation` to get its value.
 * we can set the `Subject` property, which becomes the e-mail subject.
 
 ## Attachments
