@@ -74,7 +74,7 @@ Or, to attach a file:
 ## Sending
 
 Depending on which NuGet package you've picked above, you get a backend for sending either via the classic
-`System.Net.Mail`, or via `MailKit`/MimeKit. In the below, replace `YourMailSender` with either `SystemNetMailSender` or
+`System.Net.Mail`, or via `MailKit`/MimeKit. In the code below, replace `YourMailSender` with either `SystemNetMailSender` or
 `MailKitMailSender`.
 
 To wrap it all up:
