@@ -53,8 +53,13 @@ For example, to show an image inline, you simply do:
 <img src="@InlineFile("My Company Logo.png")" />
 ```
 
-That's it. This attaches the image as a file, then references it using `cid` format. Because the image is attached, this
-also doesn't require your users to enable loading external images.
+That's it. This attaches the image as a file, then references it using `cid` format[^1].
+Because the image is attached, this also doesn't require your users to enable
+loading external images, which some mail clients restricts for privacy reasons.
+
+[^1] Each attachment becomes part of a [MIME multipart message](https://en.wikipedia.org/wiki/MIME#Multipart_messages),
+and is identified by its Content-ID. To _refer_ to that part, RazorMail then
+uses the `cid:(Content-ID)` URI scheme.
 
 Or, to attach a file:
 
