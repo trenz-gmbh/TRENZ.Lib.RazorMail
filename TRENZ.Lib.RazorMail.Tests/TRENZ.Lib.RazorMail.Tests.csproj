@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TRENZ.Lib.RazorMail\TRENZ.Lib.RazorMail.csproj" />
+      <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
     </ItemGroup>
 
 </Project>

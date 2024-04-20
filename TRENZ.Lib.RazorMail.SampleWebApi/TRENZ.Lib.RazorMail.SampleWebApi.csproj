@@ -8,7 +8,7 @@
     <ItemGroup>
       <ProjectReference Include="..\TRENZ.Lib.RazorMail.MailKit\TRENZ.Lib.RazorMail.MailKit.csproj" />
       <ProjectReference Include="..\TRENZ.Lib.RazorMail.System.Net\TRENZ.Lib.RazorMail.System.Net.csproj" />
-      <ProjectReference Include="..\TRENZ.Lib.RazorMail\TRENZ.Lib.RazorMail.csproj" />
+      <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

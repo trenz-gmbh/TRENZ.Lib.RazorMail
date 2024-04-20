@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail", "TRENZ.Lib.RazorMail\TRENZ.Lib.RazorMail.csproj", "{DEA0A5B5-6714-441D-9A9F-CD0DF2221DAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.Core", "TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj", "{DEA0A5B5-6714-441D-9A9F-CD0DF2221DAF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{7D436ED8-6498-4D5F-991C-C7CFD90242CA}"
 	ProjectSection(SolutionItems) = preProject
