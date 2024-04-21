@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TRENZ.Lib.RazorMail\TRENZ.Lib.RazorMail.csproj" />
-<!--        <PackageReference Include="TRENZ.Lib.RazorMail" Version="1.0.0" />-->
+      <ProjectReference Include="..\TRENZ.Lib.RazorMail.MailKit\TRENZ.Lib.RazorMail.MailKit.csproj" />
+      <ProjectReference Include="..\TRENZ.Lib.RazorMail.System.Net\TRENZ.Lib.RazorMail.System.Net.csproj" />
+      <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

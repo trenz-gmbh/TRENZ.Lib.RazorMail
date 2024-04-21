@@ -397,3 +397,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 .DS_Store
+TRENZ.Lib.RazorMail.SampleWebApi/appsettings.local.json
