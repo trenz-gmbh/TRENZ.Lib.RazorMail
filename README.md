@@ -4,9 +4,25 @@
 This is a simple library you can use to write e-mail templates in [Razor syntax](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/razor). That means you write raw HTML,
 but elevated with C# — you get `@foreach`, `@switch`, and so on, _and_ you get a strongly-typed model for custom data.
 
+## Installation
+
 In NuGet, reference either the `TRENZ.Lib.RazorMail.SystemNet` or the `TRENZ.Lib.RazorMail.MailKit` package, depending
 on which `MailSender` backend you prefer. [MailKit](https://github.com/jstedfast/MailKit) is more modern and powerful,
 but `System.Net.Mail` comes built into .NET. There is no need to reference `TRENZ.Lib.RazorMail` directly.
+
+Via dotnet:
+
+```bash
+dotnet add package TRENZ.Lib.RazorMail.SystemNet
+```
+
+…or:
+
+```bash
+dotnet add package TRENZ.Lib.RazorMail.MailKit
+```
+
+## Usage
 
 A simple template looks like so:
 
