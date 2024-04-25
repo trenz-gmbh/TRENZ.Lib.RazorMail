@@ -22,10 +22,13 @@ public abstract class MailSender
         From = from;
     }
 
-    protected MailSender(MailAddress from, List<MailAddress> to, RenderedMail renderedMail)
+    protected MailSender(MailAddress from, IEnumerable<MailAddress> to, IEnumerable<MailAddress> cc, IEnumerable<MailAddress> bcc, IEnumerable<MailAddress> replyTo, RenderedMail renderedMail)
         : this(from)
     {
         To.AddRange(to);
+        Cc.AddRange(cc);
+        Bcc.AddRange(bcc);
+        ReplyTo.AddRange(replyTo);
 
         HtmlBodies.Add(renderedMail.HtmlBody);
 
@@ -38,12 +41,13 @@ public abstract class MailSender
 
     public MailAddress From { get; }
     public List<MailAddress> To { get; } = new();
+    public List<MailAddress> ReplyTo { get; } = new();
     public List<MailAddress> Cc { get; } = new();
     public List<MailAddress> Bcc { get; } = new();
 
     /// <summary>
     /// The e-mail subject.
-    /// 
+    ///
     /// However, if the template contains its own non-empty subject, it
     /// takes precedence.
     /// </summary>

@@ -18,8 +18,8 @@ public class MailKitMailSender : MailSender
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-    public MailKitMailSender(MailAddress from, List<MailAddress> to, RenderedMail renderedMail)
-        : base(from, to, renderedMail)
+    public MailKitMailSender(MailAddress from, IEnumerable<MailAddress> to, IEnumerable<MailAddress> cc, IEnumerable<MailAddress> bcc, IEnumerable<MailAddress> replyTo, RenderedMail renderedMail)
+        : base(from, to, cc, bcc, replyTo, renderedMail)
     {
     }
 
@@ -63,6 +63,9 @@ public class MailKitMailSender : MailSender
 
         foreach (var item in Bcc)
             mail.Bcc.Add(item.ToMailboxAddress());
+
+        foreach (var item in ReplyTo)
+            mail.ReplyTo.Add(item.ToMailboxAddress());
 
         Log.Info(
             $"Sending mail from {mail.From} to {string.Join(", ", mail.To)}, cc {string.Join(", ", mail.Cc)}, bcc {string.Join(", ", mail.Bcc)}");

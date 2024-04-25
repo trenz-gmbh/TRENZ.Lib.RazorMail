@@ -16,11 +16,11 @@ public class SystemNetMailSender : MailSender
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 
-    public SystemNetMailSender(MailAddress from, List<MailAddress> to, RenderedMail renderedMail) 
-        : base(from, to, renderedMail)
+    public SystemNetMailSender(MailAddress from, IEnumerable<MailAddress> to, IEnumerable<MailAddress> cc, IEnumerable<MailAddress> bcc, IEnumerable<MailAddress> replyTo, RenderedMail renderedMail)
+        : base(from, to, cc, bcc, replyTo, renderedMail)
     {
     }
-    
+
     public override async Task SendAsync(SmtpAccount account)
     {
         using var client = new System.Net.Mail.SmtpClient(account.Host);
@@ -48,6 +48,9 @@ public class SystemNetMailSender : MailSender
 
         foreach (var item in Bcc)
             mail.Bcc.Add(item.ToMailAddress());
+
+        foreach (var item in ReplyTo)
+            mail.ReplyToList.Add(item.ToMailAddress());
 
         foreach (var item in Attachments)
             mail.Attachments.Add(item.ToAttachment());
