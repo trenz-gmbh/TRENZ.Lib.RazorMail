@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <PackageReference Include="NUnit" Version="4.1.0" />
-    <PackageReference Include="NLog" Version="5.2.8" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using NLog;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 using TRENZ.Lib.RazorMail.Models;
 
@@ -9,17 +10,19 @@ namespace TRENZ.Lib.RazorMail.Services;
 
 public abstract class MailSender
 {
-    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+    protected readonly ILogger<MailSender> Logger;
 
     // TODO: this isn't very useful yet; need support for includes/hierachy
     public List<string> HtmlBodies { get; private set; }
     public List<MailAttachment> Attachments { get; private set; }
 
-    private MailSender(MailAddress from)
+    private MailSender(MailAddress from, ILogger<MailSender>? logger = null)
     {
         HtmlBodies = new List<string>();
         Attachments = new List<MailAttachment>();
         From = from;
+
+        Logger = logger ?? NullLogger<MailSender>.Instance;
     }
 
     protected MailSender(
@@ -28,9 +31,10 @@ public abstract class MailSender
         IEnumerable<MailAddress> cc,
         IEnumerable<MailAddress> bcc,
         IEnumerable<MailAddress> replyTo,
-        RenderedMail renderedMail
+        RenderedMail renderedMail,
+        ILogger<MailSender>? logger = null
     )
-        : this(from)
+        : this(from, logger)
     {
         To.AddRange(to);
         Cc.AddRange(cc);
