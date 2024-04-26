@@ -4,17 +4,17 @@ Content-Type: application/json
 
 {
   "from": "foo@example.com",
-  "to": "bar@example.com",
+  "to": ["bar@example.com"],
   "salutation": "Dear Bar"
 }
 
 ###
-# Via HTTP and MailKit
+# Via HTTP and MailKit and multiple recipients
 POST http://localhost:5102/mail/SendWithMailKit
 Content-Type: application/json
 
 {
   "from": "foo@example.com",
-  "to": "bar@example.com",
+  "to": ["bar@example.com", "qux@example.com"],
   "salutation": "Dear Bar"
 }

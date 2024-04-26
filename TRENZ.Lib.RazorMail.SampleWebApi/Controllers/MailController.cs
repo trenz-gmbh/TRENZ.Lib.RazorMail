@@ -25,7 +25,7 @@ public class MailController(
 
         var mail = new SystemNetMailSender(
             from: request.From,
-            to: [request.To],
+            to: request.To.Select(x => new MailAddress(x)),
             cc: [],
             bcc: [],
             replyTo: [],
@@ -45,7 +45,7 @@ public class MailController(
 
         var mail = new MailKitMailSender(
             from: request.From,
-            to: [request.To],
+            to: request.To.Select(x => new MailAddress(x)),
             cc: [],
             bcc: [],
             replyTo: [],
