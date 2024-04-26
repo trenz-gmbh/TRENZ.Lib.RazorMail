@@ -2,7 +2,9 @@ using System;
 
 using NUnit.Framework;
 
-namespace TRENZ.Lib.RazorMail.Models;
+using TRENZ.Lib.RazorMail.Models;
+
+namespace TRENZ.Lib.RazorMail.Tests;
 
 public class MailAddressTests
 {
