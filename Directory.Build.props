@@ -11,6 +11,7 @@
         <Authors>TRENZ GmbH</Authors>
         <PackageProjectUrl>https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail</PackageProjectUrl>
         <License>MIT</License>
+        <PackageReadmeFile>../README.md</PackageReadmeFile>
         <RepositoryUrl>git@github.com:trenz-gmbh/TRENZ.Lib.RazorMail.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
