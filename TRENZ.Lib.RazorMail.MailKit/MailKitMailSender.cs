@@ -14,14 +14,17 @@ using TRENZ.Lib.RazorMail.Services;
 
 namespace TRENZ.Lib.RazorMail;
 
-public class MailKitMailSender : MailSender
+public class MailKitMailSender(
+    MailAddress from,
+    IEnumerable<MailAddress> to,
+    IEnumerable<MailAddress> cc,
+    IEnumerable<MailAddress> bcc,
+    IEnumerable<MailAddress> replyTo,
+    RenderedMail renderedMail
+)
+    : MailSender(from, to, cc, bcc, replyTo, renderedMail)
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-
-    public MailKitMailSender(MailAddress from, List<MailAddress> to, RenderedMail renderedMail)
-        : base(from, to, renderedMail)
-    {
-    }
 
     public override async Task SendAsync(SmtpAccount account)
     {
@@ -48,11 +51,6 @@ public class MailKitMailSender : MailSender
         }
 
         mail.Body = bodyBuilder.ToMessageBody();
-
-        // TODO later version
-        //if (replyTo != null)
-        //    mail.ReplyToList.Add(replyTo);
-
         mail.From.Add(From.ToMailboxAddress());
 
         foreach (var item in To)
@@ -63,6 +61,9 @@ public class MailKitMailSender : MailSender
 
         foreach (var item in Bcc)
             mail.Bcc.Add(item.ToMailboxAddress());
+
+        foreach (var item in ReplyTo)
+            mail.ReplyTo.Add(item.ToMailboxAddress());
 
         Log.Info(
             $"Sending mail from {mail.From} to {string.Join(", ", mail.To)}, cc {string.Join(", ", mail.Cc)}, bcc {string.Join(", ", mail.Bcc)}");

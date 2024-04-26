@@ -13,7 +13,7 @@ public class MailController(
     : ControllerBase
 {
     private IRazorEmailRenderer EmailRenderer { get; } = emailRenderer;
-    private SmtpAccount SmtpAccount { get; } = 
+    private SmtpAccount SmtpAccount { get; } =
         configuration.GetSection("SmtpAccount").Get<SmtpAccount>()!;
 
     [HttpPost]
@@ -21,9 +21,14 @@ public class MailController(
     {
         var renderedMail = await MakeRenderedMail(request);
 
-        var mail = new SystemNetMailSender(from: request.From,
-            to: new[] { (MailAddress)request.To }.ToList(),
-            renderedMail);
+        var mail = new SystemNetMailSender(
+            from: request.From,
+            to: [request.To],
+            cc: [],
+            bcc: [],
+            replyTo: [],
+            renderedMail: renderedMail
+        );
 
         await mail.SendAsync(SmtpAccount);
 
@@ -35,9 +40,14 @@ public class MailController(
     {
         var renderedMail = await MakeRenderedMail(request);
 
-        var mail = new MailKitMailSender(from: request.From,
-            to: new[] { (MailAddress)request.To }.ToList(),
-            renderedMail);
+        var mail = new MailKitMailSender(
+            from: request.From,
+            to: [request.To],
+            cc: [],
+            bcc: [],
+            replyTo: [],
+            renderedMail: renderedMail
+        );
 
         await mail.SendAsync(SmtpAccount);
 
