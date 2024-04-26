@@ -17,6 +17,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.MailKit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.Tests", "TRENZ.Lib.RazorMail.Tests\TRENZ.Lib.RazorMail.Tests.csproj", "{819186AF-5970-4666-8403-629D44D05A8E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1997B470-00FA-4FC6-B3CF-644732D01017}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{9D4EAE01-D456-4958-9BAD-451D46C6485E}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,5 +50,9 @@ Global
 		{819186AF-5970-4666-8403-629D44D05A8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{819186AF-5970-4666-8403-629D44D05A8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{819186AF-5970-4666-8403-629D44D05A8E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1997B470-00FA-4FC6-B3CF-644732D01017} = {7D436ED8-6498-4D5F-991C-C7CFD90242CA}
+		{9D4EAE01-D456-4958-9BAD-451D46C6485E} = {1997B470-00FA-4FC6-B3CF-644732D01017}
 	EndGlobalSection
 EndGlobal
