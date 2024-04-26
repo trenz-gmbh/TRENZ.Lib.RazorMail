@@ -1,7 +1,7 @@
 using RazorMailAttachment = TRENZ.Lib.RazorMail.Models.MailAttachment;
 using SystemNetMailAttachment = System.Net.Mail.Attachment;
 
-namespace TRENZ.Lib.RazorMail.SystemNetExtensions;
+namespace TRENZ.Lib.RazorMail.Extensions;
 
 public static class MailAttachmentExtensions
 {
