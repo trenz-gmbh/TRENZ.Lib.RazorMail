@@ -9,7 +9,9 @@ namespace TRENZ.Lib.RazorMail.SampleWebApi.Controllers;
 [Route("[controller]/[action]")]
 public class MailController(
     IRazorEmailRenderer emailRenderer,
-    IConfiguration configuration)
+    IConfiguration configuration,
+    ILoggerFactory loggerFactory
+)
     : ControllerBase
 {
     private IRazorEmailRenderer EmailRenderer { get; } = emailRenderer;
@@ -27,7 +29,8 @@ public class MailController(
             cc: [],
             bcc: [],
             replyTo: [],
-            renderedMail: renderedMail
+            renderedMail: renderedMail,
+            logger: loggerFactory.CreateLogger<SystemNetMailSender>()
         );
 
         await mail.SendAsync(SmtpAccount);
@@ -46,7 +49,8 @@ public class MailController(
             cc: [],
             bcc: [],
             replyTo: [],
-            renderedMail: renderedMail
+            renderedMail: renderedMail,
+            logger: loggerFactory.CreateLogger<MailKitMailSender>()
         );
 
         await mail.SendAsync(SmtpAccount);
