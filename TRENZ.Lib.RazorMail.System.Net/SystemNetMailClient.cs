@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.Services;
@@ -17,7 +18,7 @@ using SystemNetMailMessage = System.Net.Mail.MailMessage;
 
 namespace TRENZ.Lib.RazorMail;
 
-public class SystemNetMailSender(SmtpAccount account, ILogger<SystemNetMailSender> logger) : MailSender(account)
+public class SystemNetMailClient(IOptions<SmtpAccount> accountOptions, ILogger<SystemNetMailClient> logger) : BaseMailClient(accountOptions)
 {
 
     [MustDisposeResource]

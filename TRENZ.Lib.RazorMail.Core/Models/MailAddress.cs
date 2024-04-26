@@ -18,15 +18,14 @@ public class MailAddress
     }
 
     /// <summary>
+    /// Represents an e-mail address with an optional display name.
+    /// </summary>
+    public MailAddress(string address) => Email = _ValidateEmail(address);
+
+    /// <summary>
     /// The actual e-mail address.
     /// </summary>
-    public required string Email
-    {
-        get => email ?? throw new InvalidOperationException("E-mail address is not set");
-        init => email = _ValidateEmail(value);
-    }
-
-    private readonly string? email;
+    public string Email { get; }
 
     /// <summary>
     /// The display name of the e-mail address.
@@ -35,7 +34,7 @@ public class MailAddress
 
     public static implicit operator string(MailAddress address) => address.Email;
 
-    public static implicit operator MailAddress(string address) => new() { Email = address };
+    public static implicit operator MailAddress(string address) => new(address);
 
     public override string ToString() => string.IsNullOrWhiteSpace(Name) ? Email : $"{Name} <{Email}>";
 }

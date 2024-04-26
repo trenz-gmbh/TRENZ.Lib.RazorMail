@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,10 +8,11 @@ using MailKit.Net.Smtp;
 using MailKit.Security;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 using MimeKit;
 
-using TRENZ.Lib.RazorMail.MailKitExtensions;
+using TRENZ.Lib.RazorMail.Extensions;
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.Services;
 
@@ -22,7 +22,7 @@ using IMailKitMailMessage = MimeKit.IMimeMessage;
 
 namespace TRENZ.Lib.RazorMail;
 
-public class MailKitMailSender(SmtpAccount account, ILogger<MailKitMailSender> logger) : MailSender(account)
+public class MailKitMailClient(IOptions<SmtpAccount> accountOptions, ILogger<MailKitMailClient> logger) : BaseMailClient(accountOptions)
 {
     [MustDisposeResource]
     private async Task<SmtpClient> CreateClientAsync(CancellationToken cancellationToken)

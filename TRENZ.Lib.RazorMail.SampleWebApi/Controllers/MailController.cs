@@ -3,58 +3,51 @@ using Microsoft.AspNetCore.Mvc;
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.SampleWebApi.Models;
-using TRENZ.Lib.RazorMail.Services;
 
 namespace TRENZ.Lib.RazorMail.SampleWebApi.Controllers;
 
 [Route("[controller]/[action]")]
 public class MailController(
-    IMailRenderer emailRenderer,
-    IConfiguration configuration,
-    ILoggerFactory loggerFactory
+    IMailRenderer emailRenderer
 )
     : ControllerBase
 {
-    private IMailRenderer EmailRenderer { get; } = emailRenderer;
-    private SmtpAccount SmtpAccount { get; } =
-        configuration.GetSection("SmtpAccount").Get<SmtpAccount>()!;
-
     [HttpPost]
-    public async Task<IActionResult> SendWithSystemNet([FromBody] SendSampleMailRequest request)
+    public async Task<IActionResult> SendWithSystemNet([FromBody] SendSampleMailRequest request, [FromKeyedServices("System.Net.Mail")] IMailClient client)
     {
         var renderedMail = await MakeRenderedMail(request);
 
-        var mail = new SystemNetMailSender(
-            from: request.From,
-            to: request.To.Select(x => new MailAddress(x)),
-            cc: [],
-            bcc: [],
-            replyTo: [],
-            mailContent: renderedMail,
-            logger: loggerFactory.CreateLogger<SystemNetMailSender>()
-        );
+        var message = new MailMessage
+        {
+            Content = renderedMail,
+            Headers = new()
+            {
+                From = request.From,
+                Recipients = request.To.Select(x => new MailAddress(x)),
+            },
+        };
 
-        await mail.SendAsync(SmtpAccount);
+        await client.SendAsync(message);
 
         return Ok();
     }
 
     [HttpPost]
-    public async Task<IActionResult> SendWithMailKit([FromBody] SendSampleMailRequest request)
+    public async Task<IActionResult> SendWithMailKit([FromBody] SendSampleMailRequest request, [FromKeyedServices("MailKit")] IMailClient client)
     {
         var renderedMail = await MakeRenderedMail(request);
 
-        var mail = new MailKitMailSender(
-            from: request.From,
-            to: request.To.Select(x => new MailAddress(x)),
-            cc: [],
-            bcc: [],
-            replyTo: [],
-            mailContent: renderedMail,
-            logger: loggerFactory.CreateLogger<MailKitMailSender>()
-        );
+        var message = new MailMessage
+        {
+            Content = renderedMail,
+            Headers = new()
+            {
+                From = request.From,
+                Recipients = request.To.Select(x => new MailAddress(x)),
+            },
+        };
 
-        await mail.SendAsync(SmtpAccount);
+        await client.SendAsync(message);
 
         return Ok();
     }
@@ -63,7 +56,7 @@ public class MailController(
     {
         const string view = "Sample";
         var model = new SampleModel(request.Salutation);
-        var renderedMail = await EmailRenderer.RenderAsync(view, model);
+        var renderedMail = await emailRenderer.RenderAsync(view, model);
         return renderedMail;
     }
 }

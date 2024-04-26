@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -24,7 +26,8 @@ namespace TRENZ.Lib.RazorMail.Services;
 /// via https://scottsauber.com/2018/07/07/walkthrough-creating-an-html-email-template-with-razor-and-razor-class-libraries-and-rendering-it-from-a-net-standard-class-library/
 /// </summary>
 public class MailRenderer(
-    IViewEngine viewEngine,
+    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor", Justification = "Only IRazorViewEngine is registered in the DI container.")]
+    IRazorViewEngine viewEngine,
     ITempDataProvider tempDataProvider,
     IServiceProvider serviceProvider,
     IHostEnvironment environment
