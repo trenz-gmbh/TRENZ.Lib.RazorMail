@@ -1,15 +1,13 @@
-using System.IO;
-
-using TRENZ.Lib.RazorMail.Models;
+using RazorMailAttachment = TRENZ.Lib.RazorMail.Models.MailAttachment;
+using SystemNetMailAttachment = System.Net.Mail.Attachment;
 
 namespace TRENZ.Lib.RazorMail.SystemNetExtensions;
 
 public static class MailAttachmentExtensions
 {
-    public static System.Net.Mail.Attachment ToAttachment(this MailAttachment attachment)
+    public static SystemNetMailAttachment ToAttachment(this RazorMailAttachment attachment)
     {
-        var result = new System.Net.Mail.Attachment(new MemoryStream(attachment.FileData), attachment.Filename,
-            attachment.ContentType);
+        var result = new SystemNetMailAttachment(attachment.FileStream, attachment.FileName, attachment.ContentType);
 
         result.ContentId = attachment.ContentId;
         result.ContentDisposition!.Inline = attachment.Inline;
