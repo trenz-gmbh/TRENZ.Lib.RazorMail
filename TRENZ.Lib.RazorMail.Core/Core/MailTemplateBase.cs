@@ -14,12 +14,12 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
     {
         get
         {
-            if (!this.ViewData.TryGetValue("Attachments", out var dict))
-            {
-                dict = new Dictionary<string, MailAttachment>();
+            if (this.ViewData.TryGetValue("Attachments", out var dict)) 
+                return (Dictionary<string, MailAttachment>)dict!;
+            
+            dict = new Dictionary<string, MailAttachment>();
 
-                this.ViewData["Attachments"] = dict;
-            }
+            this.ViewData["Attachments"] = dict;
 
             return (Dictionary<string, MailAttachment>)dict;
         }
