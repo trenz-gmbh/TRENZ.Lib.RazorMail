@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
+using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Services;
 
 namespace TRENZ.Lib.RazorMail.Extensions;
@@ -11,7 +12,7 @@ public static class RazorMailServiceCollectionExtensions
         services.AddMvcCore()
                 .AddRazorViewEngine();
 
-        services.AddTransient<IRazorEmailRenderer, RazorEmailRenderer>();
+        services.AddTransient<IMailRenderer, MailRenderer>();
 
         return services;
     }

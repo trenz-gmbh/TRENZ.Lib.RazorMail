@@ -6,20 +6,20 @@ namespace TRENZ.Lib.RazorMail.Models;
 /// This class gets returned from the isolated template after it has been
 /// rendered, and separates the various portions of the e-mail.
 /// </summary>
-public class MailContent(string? subject, string htmlBody, IDictionary<string, MailAttachment> attachments)
+public class MailContent
 {
     /// <summary>
     /// The subject of the mail.
     /// </summary>
-    public string? Subject { get; private set; } = subject;
+    public string? Subject { get; set; }
 
     /// <summary>
     /// The HTML body of the mail.
     /// </summary>
-    public string HtmlBody { get; private set; } = htmlBody;
+    public required string HtmlBody { get; set; }
 
     /// <summary>
     /// Attachments for the mail.
     /// </summary>
-    public IDictionary<string, MailAttachment> Attachments { get; private set; } = attachments;
+    public IDictionary<string, MailAttachment> Attachments { get; init; } = new Dictionary<string, MailAttachment>();
 }

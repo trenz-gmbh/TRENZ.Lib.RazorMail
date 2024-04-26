@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
+using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.SampleWebApi.Models;
 using TRENZ.Lib.RazorMail.Services;
@@ -8,13 +9,13 @@ namespace TRENZ.Lib.RazorMail.SampleWebApi.Controllers;
 
 [Route("[controller]/[action]")]
 public class MailController(
-    IRazorEmailRenderer emailRenderer,
+    IMailRenderer emailRenderer,
     IConfiguration configuration,
     ILoggerFactory loggerFactory
 )
     : ControllerBase
 {
-    private IRazorEmailRenderer EmailRenderer { get; } = emailRenderer;
+    private IMailRenderer EmailRenderer { get; } = emailRenderer;
     private SmtpAccount SmtpAccount { get; } =
         configuration.GetSection("SmtpAccount").Get<SmtpAccount>()!;
 

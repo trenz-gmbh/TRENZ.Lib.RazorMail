@@ -11,8 +11,9 @@ namespace TRENZ.Lib.RazorMail.Core;
 
 public abstract class MailTemplateBase<T> : RazorPage<T>
 {
-    private const string AttachmentsKey = "Attachments";
-    private const string SubjectKey = "Subject";
+    internal const string AttachmentsKey = "Attachments";
+    internal const string SubjectKey = "Subject";
+    internal const string ContentRootPathKey = "ContentRootPath";
 
     public Dictionary<string, MailAttachment> Attachments
     {
