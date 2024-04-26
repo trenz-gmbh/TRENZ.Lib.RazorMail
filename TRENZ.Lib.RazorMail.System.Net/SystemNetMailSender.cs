@@ -51,7 +51,7 @@ public class SystemNetMailSender(
         foreach (var item in Attachments)
             mail.Attachments.Add(item.ToAttachment());
 
-        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}", mail.From, mail.To, mail.CC, mail.Bcc);
+        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc})", mail.From, mail.To, mail.CC, mail.Bcc);
         Logger.LogInformation("Subject: {Subject}", mail.Subject);
         Logger.LogTrace("Body: {Body}", mail.Body);
 

@@ -64,7 +64,7 @@ public class MailKitMailSender(
         foreach (var item in ReplyTo)
             mail.ReplyTo.Add(item.ToMailboxAddress());
 
-        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}", mail.From, mail.To, mail.Cc, mail.Bcc);
+        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc})", mail.From, mail.To, mail.Cc, mail.Bcc);
         Logger.LogInformation("Subject: {Subject}", mail.Subject);
         Logger.LogTrace("Body: {Body}", mail.Body);
 
