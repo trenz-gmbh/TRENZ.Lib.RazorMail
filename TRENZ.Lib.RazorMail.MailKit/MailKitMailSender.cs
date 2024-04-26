@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
+using JetBrains.Annotations;
+
 using MailKit.Net.Smtp;
+using MailKit.Security;
 
 using Microsoft.Extensions.Logging;
 
@@ -12,66 +16,79 @@ using TRENZ.Lib.RazorMail.MailKitExtensions;
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.Services;
 
+using RazorMailMessage = TRENZ.Lib.RazorMail.Models.MailMessage;
+using MailKitMailMessage = MimeKit.MimeMessage;
+using IMailKitMailMessage = MimeKit.IMimeMessage;
+
 namespace TRENZ.Lib.RazorMail;
 
-public class MailKitMailSender(
-    MailAddress from,
-    IEnumerable<MailAddress> to,
-    IEnumerable<MailAddress> cc,
-    IEnumerable<MailAddress> bcc,
-    IEnumerable<MailAddress> replyTo,
-    MailContent mailContent,
-    ILogger<MailKitMailSender>? logger = null
-)
-    : MailSender(from, to, cc, bcc, replyTo, mailContent, logger)
+public class MailKitMailSender(SmtpAccount account, ILogger<MailKitMailSender> logger) : MailSender(account)
 {
-    public override async Task SendAsync(SmtpAccount account)
+    [MustDisposeResource]
+    private async Task<SmtpClient> CreateClientAsync(CancellationToken cancellationToken)
     {
-        using var client = new SmtpClient();
-        //           await client.ConnectAsync(account.Host, account.Port, account.TLS);
-        await client.ConnectAsync(account.Host, account.Port, MailKit.Security.SecureSocketOptions.Auto);
+        var client = new SmtpClient();
 
-        await client.AuthenticateAsync(new NetworkCredential(account.Login, account.Password));
+        await client.ConnectAsync(Account.Host, Account.Port, SecureSocketOptions.Auto, cancellationToken);
 
-        var mail = new MimeMessage();
+        await client.AuthenticateAsync(Account.Login, Account.Password, cancellationToken);
 
-        mail.Subject = Subject;
+        return client;
+    }
 
-        var bodyBuilder = new BodyBuilder();
+    /// <inheritdoc />
+    protected override async Task SendInternalAsync(RazorMailMessage message, CancellationToken cancellationToken)
+    {
+        var nativeMessage = ConvertToNative(message);
 
-        bodyBuilder.HtmlBody = HtmlBodies[0];
+        using var client = await CreateClientAsync(cancellationToken);
 
-        foreach (var item in Attachments)
+        var formatOptions = FormatOptions.Default.Clone();
+
+        logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
+            nativeMessage.From, nativeMessage.To, nativeMessage.Cc, nativeMessage.Bcc, nativeMessage.Subject);
+
+        await client.SendAsync(formatOptions, nativeMessage, cancellationToken);
+
+        await client.DisconnectAsync(true, cancellationToken);
+    }
+
+    private static MailKitMailMessage ConvertToNative(RazorMailMessage razorMessage)
+    {
+        var mailKitMessage = new MailKitMailMessage();
+
+        SetMailHeaders(razorMessage, mailKitMessage);
+        SetMailContent(razorMessage, mailKitMessage);
+
+        return mailKitMessage;
+    }
+
+    private static void SetMailHeaders(RazorMailMessage razorMessage, IMailKitMailMessage mailMessage)
+    {
+        mailMessage.From.Add(razorMessage.Headers.From!.ToMailboxAddress());
+        mailMessage.To.AddRange(razorMessage.Headers.Recipients.Select(x => x.ToMailboxAddress()));
+        mailMessage.Cc.AddRange(razorMessage.Headers.CarbonCopy.Select(x => x.ToMailboxAddress()));
+        mailMessage.Bcc.AddRange(razorMessage.Headers.BlindCarbonCopy.Select(x => x.ToMailboxAddress()));
+        mailMessage.ReplyTo.AddRange(razorMessage.Headers.ReplyTo.Select(x => x.ToMailboxAddress()));
+    }
+
+    private static void SetMailContent(RazorMailMessage razorMessage, IMailKitMailMessage mailMessage)
+    {
+        mailMessage.Subject = razorMessage.Content.Subject;
+
+        var bodyBuilder = new BodyBuilder
+        {
+            HtmlBody = razorMessage.Content.HtmlBody,
+        };
+
+        foreach (var item in razorMessage.Content.Attachments.Values)
         {
             var attachment =
-                bodyBuilder.Attachments.Add(item.Filename, item.FileData, ContentType.Parse(item.ContentType));
+                bodyBuilder.Attachments.Add(item.FileName, item.FileStream, ContentType.Parse(item.ContentType));
             attachment.ContentId = item.ContentId;
             attachment.IsAttachment = !item.Inline;
         }
 
-        mail.Body = bodyBuilder.ToMessageBody();
-        mail.From.Add(From.ToMailboxAddress());
-
-        foreach (var item in To)
-            mail.To.Add(item.ToMailboxAddress());
-
-        foreach (var item in Cc)
-            mail.Cc.Add(item.ToMailboxAddress());
-
-        foreach (var item in Bcc)
-            mail.Bcc.Add(item.ToMailboxAddress());
-
-        foreach (var item in ReplyTo)
-            mail.ReplyTo.Add(item.ToMailboxAddress());
-
-        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc})", mail.From, mail.To, mail.Cc, mail.Bcc);
-        Logger.LogInformation("Subject: {Subject}", mail.Subject);
-        Logger.LogTrace("Body: {Body}", mail.Body);
-
-        var formatOptions = FormatOptions.Default.Clone();
-
-        await client.SendAsync(formatOptions, mail);
-
-        await client.DisconnectAsync(true);
+        mailMessage.Body = bodyBuilder.ToMessageBody();
     }
 }

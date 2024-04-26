@@ -32,6 +32,7 @@ public class SystemNetMailSender(SmtpAccount account, ILogger<SystemNetMailSende
         return client;
     }
 
+    /// <inheritdoc />
     protected override async Task SendInternalAsync(RazorMailMessage message, CancellationToken cancellationToken)
     {
         using var nativeMessage = ConvertToNative(message);
@@ -43,6 +44,20 @@ public class SystemNetMailSender(SmtpAccount account, ILogger<SystemNetMailSende
             nativeMessage.From, nativeMessage.To, nativeMessage.CC, nativeMessage.Bcc, nativeMessage.Subject);
 
         await client.SendAsync(nativeMessage);
+    }
+
+    [MustDisposeResource]
+    private static SystemNetMailMessage ConvertToNative(RazorMailMessage razorMessage)
+    {
+        var systemNetMessage = new SystemNetMailMessage();
+
+        systemNetMessage.BodyEncoding = Encoding.UTF8;
+        systemNetMessage.IsBodyHtml = true;
+
+        SetMailHeaders(razorMessage, systemNetMessage);
+        SetMailContent(razorMessage, systemNetMessage);
+
+        return systemNetMessage;
     }
 
     private static void SetMailHeaders(RazorMailMessage razorMessage, SystemNetMailMessage systemNetMessage)
@@ -69,19 +84,5 @@ public class SystemNetMailSender(SmtpAccount account, ILogger<SystemNetMailSende
 
         foreach (var item in razorMessage.Content.Attachments.Values)
             systemNetMessage.Attachments.Add(item.ToAttachment());
-    }
-
-    [MustDisposeResource]
-    private static SystemNetMailMessage ConvertToNative(RazorMailMessage razorMessage)
-    {
-        var systemNetMessage = new SystemNetMailMessage();
-
-        systemNetMessage.BodyEncoding = Encoding.UTF8;
-        systemNetMessage.IsBodyHtml = true;
-
-        SetMailHeaders(razorMessage, systemNetMessage);
-        SetMailContent(razorMessage, systemNetMessage);
-
-        return systemNetMessage;
     }
 }
