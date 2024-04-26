@@ -29,7 +29,7 @@ public class MailController(
             cc: [],
             bcc: [],
             replyTo: [],
-            renderedMail: renderedMail,
+            mailContent: renderedMail,
             logger: loggerFactory.CreateLogger<SystemNetMailSender>()
         );
 
@@ -49,7 +49,7 @@ public class MailController(
             cc: [],
             bcc: [],
             replyTo: [],
-            renderedMail: renderedMail,
+            mailContent: renderedMail,
             logger: loggerFactory.CreateLogger<MailKitMailSender>()
         );
 
@@ -58,7 +58,7 @@ public class MailController(
         return Ok();
     }
 
-    private async Task<RenderedMail> MakeRenderedMail(SendSampleMailRequest request)
+    private async Task<MailContent> MakeRenderedMail(SendSampleMailRequest request)
     {
         const string view = "Sample";
         var model = new SampleModel(request.Salutation);

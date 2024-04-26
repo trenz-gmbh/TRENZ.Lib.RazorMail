@@ -40,7 +40,7 @@ public class RazorEmailRenderer : IRazorEmailRenderer
         _Environment = environment;
     }
 
-    public async Task<RenderedMail> RenderAsync<TModel>(string viewName, TModel model)
+    public async Task<MailContent> RenderAsync<TModel>(string viewName, TModel model)
     {
         var actionContext = GetActionContext();
         var view = FindView(actionContext, viewName);
@@ -59,7 +59,7 @@ public class RazorEmailRenderer : IRazorEmailRenderer
 
             await view.RenderAsync(viewContext);
 
-            return new RenderedMail(subject: viewContext.ViewData["Subject"] as string,
+            return new MailContent(subject: viewContext.ViewData["Subject"] as string,
                 htmlBody: output.ToString(),
                 attachments: viewContext.ViewData["Attachments"] as Dictionary<string, MailAttachment>);
         }
@@ -99,5 +99,5 @@ public class RazorEmailRenderer : IRazorEmailRenderer
 
 public interface IRazorEmailRenderer
 {
-    Task<RenderedMail> RenderAsync<TModel>(string viewName, TModel model);
+    Task<MailContent> RenderAsync<TModel>(string viewName, TModel model);
 }

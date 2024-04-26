@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
@@ -10,16 +11,19 @@ namespace TRENZ.Lib.RazorMail.Core;
 
 public abstract class MailTemplateBase<T> : RazorPage<T>
 {
+    private const string AttachmentsKey = "Attachments";
+    private const string SubjectKey = "Subject";
+
     public Dictionary<string, MailAttachment> Attachments
     {
         get
         {
-            if (this.ViewData.TryGetValue("Attachments", out var dict)) 
+            if (ViewData.TryGetValue(AttachmentsKey, out var dict))
                 return (Dictionary<string, MailAttachment>)dict!;
-            
+
             dict = new Dictionary<string, MailAttachment>();
 
-            this.ViewData["Attachments"] = dict;
+            ViewData[AttachmentsKey] = dict;
 
             return (Dictionary<string, MailAttachment>)dict;
         }
@@ -27,8 +31,8 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
 
     public string? Subject
     {
-        get => this.ViewData["Subject"] as string;
-        set => this.ViewData["Subject"] = value;
+        get => ViewData[SubjectKey] as string;
+        set => ViewData[SubjectKey] = value;
     }
 
     public string InlineFile(string filename)
@@ -38,52 +42,60 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
         => _AttachFile(filename, ContentDisposition.Attachment);
 
     public string InlineFile(string filename, byte[] fileData)
-        => _AttachFile(filename, fileData, ContentDisposition.Inline);
+        => _AttachFile(filename, new MemoryStream(fileData), ContentDisposition.Inline);
 
     public void AttachFile(string filename, byte[] fileData)
-        => _AttachFile(filename, fileData, ContentDisposition.Attachment);
+        => _AttachFile(filename, new MemoryStream(fileData), ContentDisposition.Attachment);
 
     private string _AttachFile(string filename, ContentDisposition contentDisposition)
     {
         var contentRootPath = TempData["ContentRootPath"] as string ??
                               throw new InvalidOperationException(nameof(TempData));
 
-        var viewPath = this.Path.TrimStart('/');
+        var viewPath = Path.TrimStart('/');
 
         var parentDir = System.IO.Path.GetDirectoryName(viewPath) ?? throw new ArgumentException(nameof(this.Path));
 
         var absolutePath = System.IO.Path.Combine(contentRootPath, parentDir, filename);
 
-        return _AttachFile(filename, System.IO.File.ReadAllBytes(absolutePath), contentDisposition);
+        return _AttachFile(filename, File.OpenRead(absolutePath), contentDisposition);
     }
 
-    private string _AttachFile(string filename, byte[] fileData, ContentDisposition contentDisposition)
+    private string _AttachFile(string filename, Stream stream, ContentDisposition contentDisposition)
     {
         if (!new FileExtensionContentTypeProvider().TryGetContentType(filename, out var contentType))
             throw new NotSupportedException($"Couldn't figure out content type for {filename}");
 
-        if (!Attachments.ContainsKey(filename))
+        var cid = $"cid:{filename}";
+        if (Attachments.ContainsKey(filename))
+            return cid;
+
+        var attachment = new MailAttachment
         {
-            var attachment = new MailAttachment(fileData, filename, contentType);
+            FileName = filename,
+            FileStream = stream,
+            ContentType = contentType,
+        };
 
-            switch (contentDisposition)
-            {
-                case ContentDisposition.Inline:
-                    attachment.ContentId = filename;
-                    attachment.Inline = true;
+        switch (contentDisposition)
+        {
+            case ContentDisposition.Inline:
+                attachment.ContentId = filename;
+                attachment.Inline = true;
 
-                    break;
-                case ContentDisposition.Attachment:
-                    attachment.Inline = false;
+                break;
+            case ContentDisposition.Attachment:
+                attachment.Inline = false;
 
-                    break;
-                default:
-                    break;
-            }
-
-            Attachments[filename] = attachment;
+                break;
+            case ContentDisposition.Unset:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(contentDisposition), contentDisposition, "Unknown content disposition");
         }
 
-        return $"cid:{filename}";
+        Attachments[filename] = attachment;
+
+        return cid;
     }
 }

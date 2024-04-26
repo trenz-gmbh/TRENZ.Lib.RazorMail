@@ -3,44 +3,39 @@ using System.Diagnostics;
 
 namespace TRENZ.Lib.RazorMail.Models;
 
+/// <summary>
+/// Represents an e-mail address with an optional display name.
+/// </summary>
 [DebuggerDisplay("Email = {Email}, Name = {Name}")]
 public class MailAddress
 {
-    public MailAddress(string email)
+    private static string _ValidateEmail(string email)
     {
-        _ValidateEmail(email);
-
-        Email = email;
-    }
-
-    public MailAddress(string email, string name)
-    {
-        _ValidateEmail(email);
-
-        Email = email;
-        Name = name;
-    }
-
-    private static void _ValidateEmail(string email)
-    {
-        if (!email.Contains("@"))
+        if (!email.Contains('@'))
             throw new FormatException($"E-mail address '{email}' doesn't look valid");
+
+        return email;
     }
 
-    public string Email { get; set; }
-    public string Name { get; set; } = "";
-
-    public static implicit operator string(MailAddress address)
-        => address.Email;
-
-    public static implicit operator MailAddress(string address)
-        => new MailAddress(address, "");
-
-    public override string ToString()
+    /// <summary>
+    /// The actual e-mail address.
+    /// </summary>
+    public required string Email
     {
-        if (string.IsNullOrWhiteSpace(Name))
-            return Email;
-
-        return $"{Name} <{Email}>";
+        get => email ?? throw new InvalidOperationException("E-mail address is not set");
+        init => email = _ValidateEmail(value);
     }
+
+    private readonly string? email;
+
+    /// <summary>
+    /// The display name of the e-mail address.
+    /// </summary>
+    public string? Name { get; init; }
+
+    public static implicit operator string(MailAddress address) => address.Email;
+
+    public static implicit operator MailAddress(string address) => new() { Email = address };
+
+    public override string ToString() => string.IsNullOrWhiteSpace(Name) ? Email : $"{Name} <{Email}>";
 }

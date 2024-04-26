@@ -17,10 +17,10 @@ public class SystemNetMailSender(
     IEnumerable<MailAddress> cc,
     IEnumerable<MailAddress> bcc,
     IEnumerable<MailAddress> replyTo,
-    RenderedMail renderedMail,
+    MailContent mailContent,
     ILogger<SystemNetMailSender>? logger = null
 )
-    : MailSender(from, to, cc, bcc, replyTo, renderedMail, logger)
+    : MailSender(from, to, cc, bcc, replyTo, mailContent, logger)
 {
     public override async Task SendAsync(SmtpAccount account)
     {

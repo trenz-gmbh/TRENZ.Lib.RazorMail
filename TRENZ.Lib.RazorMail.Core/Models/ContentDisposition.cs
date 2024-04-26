@@ -2,7 +2,7 @@ namespace TRENZ.Lib.RazorMail.Models;
 
 public enum ContentDisposition
 {
-    Unknown = 0,
+    Unset = 0,
     Inline,
     Attachment
 }

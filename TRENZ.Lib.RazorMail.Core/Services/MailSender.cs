@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Logging;
@@ -8,61 +9,42 @@ using TRENZ.Lib.RazorMail.Models;
 
 namespace TRENZ.Lib.RazorMail.Services;
 
-public abstract class MailSender
+/// <summary>
+/// Creates a new mail sender with the specified SMTP account.
+/// </summary>
+/// <param name="account">The account to use for sending emails.</param>
+public abstract class MailSender(SmtpAccount account)
 {
-    protected readonly ILogger<MailSender> Logger;
-
-    // TODO: this isn't very useful yet; need support for includes/hierachy
-    public List<string> HtmlBodies { get; private set; }
-    public List<MailAttachment> Attachments { get; private set; }
-
-    private MailSender(MailAddress from, ILogger<MailSender>? logger = null)
-    {
-        HtmlBodies = new List<string>();
-        Attachments = new List<MailAttachment>();
-        From = from;
-
-        Logger = logger ?? NullLogger<MailSender>.Instance;
-    }
-
-    protected MailSender(
-        MailAddress from,
-        IEnumerable<MailAddress> to,
-        IEnumerable<MailAddress> cc,
-        IEnumerable<MailAddress> bcc,
-        IEnumerable<MailAddress> replyTo,
-        RenderedMail renderedMail,
-        ILogger<MailSender>? logger = null
-    )
-        : this(from, logger)
-    {
-        To.AddRange(to);
-        Cc.AddRange(cc);
-        Bcc.AddRange(bcc);
-        ReplyTo.AddRange(replyTo);
-
-        HtmlBodies.Add(renderedMail.HtmlBody);
-
-        if (!string.IsNullOrWhiteSpace(renderedMail.Subject))
-            Subject = renderedMail.Subject;
-
-        if (renderedMail.Attachments != null)
-            Attachments.AddRange(renderedMail.Attachments.Values);
-    }
-
-    public MailAddress From { get; }
-    public List<MailAddress> To { get; } = new();
-    public List<MailAddress> ReplyTo { get; } = new();
-    public List<MailAddress> Cc { get; } = new();
-    public List<MailAddress> Bcc { get; } = new();
+    /// <summary>
+    /// The default "From" address.
+    /// </summary>
+    public MailAddress? DefaultFrom { get; set; }
 
     /// <summary>
-    /// The e-mail subject.
-    ///
-    /// However, if the template contains its own non-empty subject, it
-    /// takes precedence.
+    /// The default set of recipients.
     /// </summary>
-    public string Subject { get; set; } = "";
+    public IEnumerable<MailAddress> DefaultRecipients { get; set; } = [];
 
-    public abstract Task SendAsync(SmtpAccount account);
+    /// <summary>
+    /// The default set of CC recipients.
+    /// </summary>
+    public IEnumerable<MailAddress> DefaultCc { get; } = [];
+
+    /// <summary>
+    /// The default set of BCC recipients.
+    /// </summary>
+    public IEnumerable<MailAddress> DefaultBcc { get; } = [];
+
+    /// <summary>
+    /// The default set of reply-to addresses.
+    /// </summary>
+    public IEnumerable<MailAddress> DefaultReplyTo { get; } = [];
+
+    /// <summary>
+    /// Sends an email message asynchronously.
+    /// </summary>
+    /// <param name="message">The message to send.</param>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    public abstract Task SendAsync(MailMessage message, CancellationToken cancellationToken = default);
 }
