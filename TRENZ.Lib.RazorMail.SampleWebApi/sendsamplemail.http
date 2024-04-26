@@ -1,0 +1,20 @@
+# Via HTTPS and System.Net.Mail
+POST https://localhost:7141/mail/SendWithSystemNet
+Content-Type: application/json
+
+{
+  "from": "foo@example.com",
+  "to": "bar@example.com",
+  "salutation": "Dear Bar"
+}
+
+###
+# Via HTTP and MailKit
+POST http://localhost:5102/mail/SendWithMailKit
+Content-Type: application/json
+
+{
+  "from": "foo@example.com",
+  "to": "bar@example.com",
+  "salutation": "Dear Bar"
+}
