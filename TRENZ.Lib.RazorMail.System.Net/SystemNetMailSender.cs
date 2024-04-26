@@ -12,14 +12,17 @@ using TRENZ.Lib.RazorMail.SystemNetExtensions;
 
 namespace TRENZ.Lib.RazorMail;
 
-public class SystemNetMailSender : MailSender
+public class SystemNetMailSender(
+    MailAddress from,
+    IEnumerable<MailAddress> to,
+    IEnumerable<MailAddress> cc,
+    IEnumerable<MailAddress> bcc,
+    IEnumerable<MailAddress> replyTo,
+    RenderedMail renderedMail
+)
+    : MailSender(from, to, cc, bcc, replyTo, renderedMail)
 {
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-
-    public SystemNetMailSender(MailAddress from, IEnumerable<MailAddress> to, IEnumerable<MailAddress> cc, IEnumerable<MailAddress> bcc, IEnumerable<MailAddress> replyTo, RenderedMail renderedMail)
-        : base(from, to, cc, bcc, replyTo, renderedMail)
-    {
-    }
 
     public override async Task SendAsync(SmtpAccount account)
     {
@@ -33,11 +36,6 @@ public class SystemNetMailSender : MailSender
         mail.IsBodyHtml = true;
         mail.Subject = Subject;
         mail.Body = HtmlBodies[0];
-
-        // TODO later version
-        //if (replyTo != null)
-        //    mail.ReplyToList.Add(replyTo);
-
         mail.From = From.ToMailAddress();
 
         foreach (var item in To)

@@ -22,7 +22,14 @@ public abstract class MailSender
         From = from;
     }
 
-    protected MailSender(MailAddress from, IEnumerable<MailAddress> to, IEnumerable<MailAddress> cc, IEnumerable<MailAddress> bcc, IEnumerable<MailAddress> replyTo, RenderedMail renderedMail)
+    protected MailSender(
+        MailAddress from,
+        IEnumerable<MailAddress> to,
+        IEnumerable<MailAddress> cc,
+        IEnumerable<MailAddress> bcc,
+        IEnumerable<MailAddress> replyTo,
+        RenderedMail renderedMail
+    )
         : this(from)
     {
         To.AddRange(to);
