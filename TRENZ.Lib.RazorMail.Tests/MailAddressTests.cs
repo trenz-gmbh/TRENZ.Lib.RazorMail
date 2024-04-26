@@ -21,15 +21,20 @@ public class MailAddressTests
     public void CtorWithBoth()
     {
         var address = new MailAddress(_EXPECTED_ADDRESS, _EXPECTED_NAME);
-        Assert.That(_EXPECTED_ADDRESS, Is.EqualTo(address.Email));
-        Assert.That(_EXPECTED_NAME, Is.EqualTo(address.Name));
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(address.Email, Is.EqualTo(_EXPECTED_ADDRESS));
+            Assert.That(address.Name, Is.EqualTo(_EXPECTED_NAME));
+        });
     }
 
     [Test]
     public void CastFromString()
     {
         MailAddress address = _EXPECTED_ADDRESS;
-        Assert.That(_EXPECTED_ADDRESS, Is.EqualTo(address.Email));
+        
+        Assert.That(address.Email, Is.EqualTo(_EXPECTED_ADDRESS));
     }
 
     [Test]
@@ -37,12 +42,13 @@ public class MailAddressTests
     {
         var address = new MailAddress(_EXPECTED_ADDRESS);
         var addressAsString = (string)address;
-        Assert.That(_EXPECTED_ADDRESS, Is.EqualTo(addressAsString));
+      
+        Assert.That(addressAsString, Is.EqualTo(_EXPECTED_ADDRESS));
     }
 
     [Test]
     public void InvalidAddress()
     {
-        Assert.Throws<FormatException>(() => new MailAddress(_INVALID_ADDRESS));
+        Assert.Throws<FormatException>(() => _ = new MailAddress(_INVALID_ADDRESS));
     }
 }
