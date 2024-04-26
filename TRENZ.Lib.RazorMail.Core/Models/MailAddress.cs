@@ -18,9 +18,17 @@ public class MailAddress
     }
 
     /// <summary>
-    /// Represents an e-mail address with an optional display name.
+    /// Creates a new instance of the <see cref="MailAddress"/> class with the specified e-mail address.
     /// </summary>
+    /// <param name="address">The e-mail address.</param>
     public MailAddress(string address) => Email = _ValidateEmail(address);
+
+    /// <summary>
+    /// Creates a new instance of the <see cref="MailAddress"/> class with the specified e-mail address and display name.
+    /// </summary>
+    /// <param name="address">The e-mail address.</param>
+    /// <param name="displayName">The display name of the e-mail address.</param>
+    public MailAddress(string address, string displayName) : this(address) => Name = displayName;
 
     /// <summary>
     /// The actual e-mail address.
