@@ -14,7 +14,8 @@ public class MailAddressTests
     public void CtorWithAddress()
     {
         var address = new MailAddress(_EXPECTED_ADDRESS);
-        Assert.That(_EXPECTED_ADDRESS, Is.EqualTo(address.Email));
+        
+        Assert.That(address.Email, Is.EqualTo(_EXPECTED_ADDRESS));
     }
 
     [Test]
