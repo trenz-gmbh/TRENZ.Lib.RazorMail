@@ -3,9 +3,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-using NLog;
+using Microsoft.Extensions.Logging;
 
-using TRENZ.Lib.RazorMail.Extensions;
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.Services;
 using TRENZ.Lib.RazorMail.SystemNetExtensions;
@@ -18,12 +17,11 @@ public class SystemNetMailSender(
     IEnumerable<MailAddress> cc,
     IEnumerable<MailAddress> bcc,
     IEnumerable<MailAddress> replyTo,
-    RenderedMail renderedMail
+    RenderedMail renderedMail,
+    ILogger<SystemNetMailSender>? logger = null
 )
-    : MailSender(from, to, cc, bcc, replyTo, renderedMail)
+    : MailSender(from, to, cc, bcc, replyTo, renderedMail, logger)
 {
-    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-
     public override async Task SendAsync(SmtpAccount account)
     {
         using var client = new System.Net.Mail.SmtpClient(account.Host);
@@ -53,11 +51,9 @@ public class SystemNetMailSender(
         foreach (var item in Attachments)
             mail.Attachments.Add(item.ToAttachment());
 
-        Log.Info($"Sending mail from {From} to {string.Join(", ", mail.To)}");
-
-        Log.Info($"{nameof(mail.Subject)}: {mail.Subject}");
-
-        Log.Debug(mail.Body);
+        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc})", mail.From, mail.To, mail.CC, mail.Bcc);
+        Logger.LogInformation("Subject: {Subject}", mail.Subject);
+        Logger.LogTrace("Body: {Body}", mail.Body);
 
         await client.SendAsync(mail);
     }
