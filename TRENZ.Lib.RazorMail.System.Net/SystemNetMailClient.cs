@@ -20,7 +20,6 @@ namespace TRENZ.Lib.RazorMail;
 
 public class SystemNetMailClient(IOptions<SmtpAccount> accountOptions, ILogger<SystemNetMailClient> logger) : BaseMailClient(accountOptions)
 {
-
     [MustDisposeResource]
     private SmtpClient CreateClient()
     {
