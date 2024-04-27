@@ -52,8 +52,8 @@ public class MailHeaderCollection : Dictionary<string, object>
     {
         get
         {
-            if (ContainsKey("From"))
-                return this["From"] as MailAddress;
+            if (TryGetValue("From", out var value) && value is MailAddress address)
+                return address;
 
             return null;
         }
@@ -68,10 +68,10 @@ public class MailHeaderCollection : Dictionary<string, object>
 
     private IEnumerable<MailAddress> GetAddresses(string key)
     {
-        if (!ContainsKey(key))
+        if (!TryGetValue(key, out var value) || value is not IEnumerable<MailAddress> addresses)
             return Array.Empty<MailAddress>();
 
-        return (this[key] as IEnumerable<MailAddress>)!;
+        return addresses;
     }
 
     private void SetAddresses(string key, IEnumerable<MailAddress> value) => this[key] = value;
