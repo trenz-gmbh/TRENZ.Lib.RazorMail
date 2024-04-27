@@ -20,7 +20,7 @@ using RazorMailMessage = TRENZ.Lib.RazorMail.Models.MailMessage;
 namespace TRENZ.Lib.RazorMail;
 
 public class MailKitMailClient(IOptions<SmtpAccount> accountOptions, ILogger<MailKitMailClient> logger)
-    : BaseMailClient(accountOptions)
+    : BaseSmtpMailClient(accountOptions)
 {
     [MustDisposeResource]
     private async Task<SmtpClient> CreateClientAsync(CancellationToken cancellationToken)

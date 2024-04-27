@@ -15,7 +15,7 @@ namespace TRENZ.Lib.RazorMail.Services;
 /// Creates a new mail sender with the specified SMTP accountOptions.
 /// </summary>
 /// <param name="accountOptions">The accountOptions to use for sending emails.</param>
-public abstract class BaseMailClient(IOptions<SmtpAccount> accountOptions) : IMailClient
+public abstract class BaseSmtpMailClient(IOptions<SmtpAccount> accountOptions) : IMailClient
 {
     /// <summary>
     /// The SMTP account to use for sending emails.

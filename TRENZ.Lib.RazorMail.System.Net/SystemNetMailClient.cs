@@ -16,7 +16,7 @@ using RazorMailMessage = TRENZ.Lib.RazorMail.Models.MailMessage;
 
 namespace TRENZ.Lib.RazorMail;
 
-public class SystemNetMailClient(IOptions<SmtpAccount> accountOptions, ILogger<SystemNetMailClient> logger) : BaseMailClient(accountOptions)
+public class SystemNetMailClient(IOptions<SmtpAccount> accountOptions, ILogger<SystemNetMailClient> logger) : BaseSmtpMailClient(accountOptions)
 {
     [MustDisposeResource]
     private SmtpClient CreateClient()
