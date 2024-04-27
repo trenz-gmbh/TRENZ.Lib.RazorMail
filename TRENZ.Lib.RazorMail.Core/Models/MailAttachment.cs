@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace TRENZ.Lib.RazorMail.Models;
+﻿namespace TRENZ.Lib.RazorMail.Models;
 
 /// <summary>
 /// A mail attachment.
@@ -10,7 +8,7 @@ public class MailAttachment
     /// <summary>
     /// The data of the file.
     /// </summary>
-    public required Stream FileStream { get; set; }
+    public required byte[] FileData { get; set; }
 
     /// <summary>
     /// The name of the file.

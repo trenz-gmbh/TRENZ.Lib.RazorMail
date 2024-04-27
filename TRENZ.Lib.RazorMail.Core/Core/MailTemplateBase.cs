@@ -43,12 +43,12 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
         => _AttachFile(filename, ContentDisposition.Attachment);
 
     public string InlineFile(string filename, byte[] fileData)
-        => _AttachFile(filename, new MemoryStream(fileData), ContentDisposition.Inline);
+        => _AttachFile(filename, fileData, ContentDisposition.Inline);
 
     public void AttachFile(string filename, byte[] fileData)
-        => _AttachFile(filename, new MemoryStream(fileData), ContentDisposition.Attachment);
+        => _AttachFile(filename, fileData, ContentDisposition.Attachment);
 
-    private string _AttachFile(string filename, ContentDisposition contentDisposition)
+    private string _AttachFile(string fileName, ContentDisposition contentDisposition)
     {
         var contentRootPath = TempData["ContentRootPath"] as string ??
                               throw new InvalidOperationException(nameof(TempData));
@@ -57,31 +57,31 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
 
         var parentDir = System.IO.Path.GetDirectoryName(viewPath) ?? throw new ArgumentException(nameof(this.Path));
 
-        var absolutePath = System.IO.Path.Combine(contentRootPath, parentDir, filename);
+        var absolutePath = System.IO.Path.Combine(contentRootPath, parentDir, fileName);
 
-        return _AttachFile(filename, File.OpenRead(absolutePath), contentDisposition);
+        return _AttachFile(fileName, File.ReadAllBytes(absolutePath), contentDisposition);
     }
 
-    private string _AttachFile(string filename, Stream stream, ContentDisposition contentDisposition)
+    private string _AttachFile(string fileName, byte[] fileData, ContentDisposition contentDisposition)
     {
-        if (!new FileExtensionContentTypeProvider().TryGetContentType(filename, out var contentType))
-            throw new NotSupportedException($"Couldn't figure out content type for {filename}");
+        if (!new FileExtensionContentTypeProvider().TryGetContentType(fileName, out var contentType))
+            throw new NotSupportedException($"Couldn't figure out content type for {fileName}");
 
-        var cid = $"cid:{filename}";
-        if (Attachments.ContainsKey(filename))
+        var cid = $"cid:{fileName}";
+        if (Attachments.ContainsKey(fileName))
             return cid;
 
         var attachment = new MailAttachment
         {
-            FileName = filename,
-            FileStream = stream,
+            FileName = fileName,
+            FileData = fileData,
             ContentType = contentType,
         };
 
         switch (contentDisposition)
         {
             case ContentDisposition.Inline:
-                attachment.ContentId = filename;
+                attachment.ContentId = fileName;
                 attachment.Inline = true;
 
                 break;
@@ -95,7 +95,7 @@ public abstract class MailTemplateBase<T> : RazorPage<T>
                 throw new ArgumentOutOfRangeException(nameof(contentDisposition), contentDisposition, "Unknown content disposition");
         }
 
-        Attachments[filename] = attachment;
+        Attachments[fileName] = attachment;
 
         return cid;
     }

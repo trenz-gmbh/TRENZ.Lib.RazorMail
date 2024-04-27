@@ -22,7 +22,8 @@ using IMailKitMailMessage = MimeKit.IMimeMessage;
 
 namespace TRENZ.Lib.RazorMail;
 
-public class MailKitMailClient(IOptions<SmtpAccount> accountOptions, ILogger<MailKitMailClient> logger) : BaseMailClient(accountOptions)
+public class MailKitMailClient(IOptions<SmtpAccount> accountOptions, ILogger<MailKitMailClient> logger)
+    : BaseMailClient(accountOptions)
 {
     [MustDisposeResource]
     private async Task<SmtpClient> CreateClientAsync(CancellationToken cancellationToken)
@@ -84,7 +85,7 @@ public class MailKitMailClient(IOptions<SmtpAccount> accountOptions, ILogger<Mai
         foreach (var item in razorMessage.Content.Attachments.Values)
         {
             var attachment =
-                bodyBuilder.Attachments.Add(item.FileName, item.FileStream, ContentType.Parse(item.ContentType));
+                bodyBuilder.Attachments.Add(item.FileName, item.FileData, ContentType.Parse(item.ContentType));
             attachment.ContentId = item.ContentId;
             attachment.IsAttachment = !item.Inline;
         }
