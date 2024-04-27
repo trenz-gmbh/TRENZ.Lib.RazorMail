@@ -48,7 +48,7 @@ public interface IMailClient
     /// <returns>A task that represents the asynchronous operation.</returns>
     /// <remarks>
     /// Adds the Default* properties from this sender to the message and validates if the mail contains a From address,
-    /// at least one recipient, a body and a subject.
+    /// at least one recipient and a body.
     /// </remarks>
     Task SendAsync(MailMessage message, CancellationToken cancellationToken = default);
 }

@@ -79,9 +79,6 @@ public abstract class BaseMailClient(IOptions<SmtpAccount> accountOptions) : IMa
 
         if (string.IsNullOrWhiteSpace(message.Content.HtmlBody))
             throw new InvalidOperationException("The HTML body must be set.");
-
-        if (string.IsNullOrWhiteSpace(message.Content.Subject))
-            throw new InvalidOperationException("The subject must be set.");
     }
 
     /// <summary>
