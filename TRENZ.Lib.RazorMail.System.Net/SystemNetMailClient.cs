@@ -44,7 +44,7 @@ public class SystemNetMailClient(IOptions<SmtpAccount> accountOptions, ILogger<S
         logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
             nativeMessage.From, nativeMessage.To, nativeMessage.CC, nativeMessage.Bcc, nativeMessage.Subject);
 
-        await client.SendAsync(nativeMessage);
+        await client.SendAsyncWithCancellation(nativeMessage, cancellationToken);
     }
 
     [MustDisposeResource]

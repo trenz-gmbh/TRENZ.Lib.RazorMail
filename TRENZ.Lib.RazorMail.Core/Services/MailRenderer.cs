@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Http;
@@ -26,7 +27,8 @@ namespace TRENZ.Lib.RazorMail.Services;
 /// via https://scottsauber.com/2018/07/07/walkthrough-creating-an-html-email-template-with-razor-and-razor-class-libraries-and-rendering-it-from-a-net-standard-class-library/
 /// </summary>
 public class MailRenderer(
-    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor", Justification = "Only IRazorViewEngine is registered in the DI container.")]
+    [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor",
+        Justification = "Only IRazorViewEngine is registered in the DI container.")]
     IRazorViewEngine viewEngine,
     ITempDataProvider tempDataProvider,
     IServiceProvider serviceProvider,
@@ -34,7 +36,8 @@ public class MailRenderer(
 )
     : IMailRenderer
 {
-    public async Task<MailContent> RenderAsync<TModel>(string viewName, TModel model)
+    public async Task<MailContent> RenderAsync<TModel>(string viewName, TModel model,
+        CancellationToken cancellationToken = default)
     {
         var actionContext = GetActionContext();
 
@@ -55,6 +58,8 @@ public class MailRenderer(
         var view = FindView(actionContext, viewName);
 
         var viewContext = new ViewContext(actionContext, view, viewData, tempData, output, htmlHelperOptions);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         await view.RenderAsync(viewContext);
 
