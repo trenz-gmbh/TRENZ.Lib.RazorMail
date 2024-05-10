@@ -170,7 +170,7 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     /// </summary>
     /// <param name="other">The collection to append.</param>
     /// <returns>The current instance.</returns>
-    public MailHeaderCollection AppendFrom(MailHeaderCollection other)
+    public MailHeaderCollection AppendRange(MailHeaderCollection other)
     {
         From ??= other.From;
 
@@ -191,7 +191,7 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     /// </summary>
     /// <param name="other">The collection to overwrite with.</param>
     /// <returns>The current instance.</returns>
-    public MailHeaderCollection OverwriteFrom(MailHeaderCollection other)
+    public MailHeaderCollection OverwriteWith(MailHeaderCollection other)
     {
         foreach (var (key, value) in other)
             this[key] = value;

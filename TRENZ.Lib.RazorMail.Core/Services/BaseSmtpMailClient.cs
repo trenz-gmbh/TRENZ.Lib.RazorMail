@@ -28,7 +28,7 @@ public abstract class BaseSmtpMailClient(IOptions<SmtpAccount> accountOptions) :
     /// <inheritdoc />
     public Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
-        message.Headers.AppendFrom(DefaultHeaders);
+        message.Headers.AppendRange(DefaultHeaders);
 
         ThrowIfInvalid(message);
 

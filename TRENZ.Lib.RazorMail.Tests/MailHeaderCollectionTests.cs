@@ -14,7 +14,7 @@ public class MailHeaderCollectionTests
             { "key", "value" },
         };
 
-        collection.AppendFrom(new MailHeaderCollection
+        collection.AppendRange(new MailHeaderCollection
         {
             { "key", "new value" },
         });
@@ -23,7 +23,7 @@ public class MailHeaderCollectionTests
     }
 
     [Test]
-    public void TestAppendDoesntRemoveAddresses()
+    public void TestAppendRangeDoesntOverwrite()
     {
         var me = new MailAddress("me@example.test");
         var you = new MailAddress("you@example.test");
@@ -45,15 +45,19 @@ public class MailHeaderCollectionTests
             BlindCarbonCopy = [brad],
             ReplyTo = [charlie],
         };
+        collection.Add("Custom", "Value");
 
-        collection.AppendFrom(new MailHeaderCollection
+        var secondCollection = new MailHeaderCollection
         {
             From = me2,
             Recipients = [you2],
             CarbonCopy = [anna2],
             BlindCarbonCopy = [brad2],
             ReplyTo = [charlie2],
-        });
+        };
+        secondCollection.Add("Custom", "New Value");
+
+        collection.AppendRange(secondCollection);
 
         Assert.Multiple(() =>
         {
@@ -62,11 +66,12 @@ public class MailHeaderCollectionTests
             Assert.That(collection.CarbonCopy, Is.EquivalentTo(new [] { anna, anna2 }));
             Assert.That(collection.BlindCarbonCopy, Is.EquivalentTo(new [] { brad, brad2 }));
             Assert.That(collection.ReplyTo, Is.EquivalentTo(new [] { charlie, charlie2 }));
+            Assert.That(collection["Custom"], Is.EqualTo("Value"));
         });
     }
 
     [Test]
-    public void TestOverwriteExistingValues()
+    public void TestOverwriteWith()
     {
         var me = new MailAddress("me@example.test");
         var you = new MailAddress("you@example.test");
@@ -88,15 +93,19 @@ public class MailHeaderCollectionTests
             BlindCarbonCopy = [brad],
             ReplyTo = [charlie],
         };
+        collection.Add("Custom", "Value");
 
-        collection.OverwriteFrom(new MailHeaderCollection
+        var secondCollection = new MailHeaderCollection
         {
             From = me2,
             Recipients = [you2],
             CarbonCopy = [anna2],
             BlindCarbonCopy = [brad2],
             ReplyTo = [charlie2],
-        });
+        };
+        secondCollection.Add("Custom", "New Value");
+
+        collection.OverwriteWith(secondCollection);
 
         Assert.Multiple(() =>
         {
@@ -105,6 +114,7 @@ public class MailHeaderCollectionTests
             Assert.That(collection.CarbonCopy, Is.EquivalentTo(new [] { anna2 }));
             Assert.That(collection.BlindCarbonCopy, Is.EquivalentTo(new [] { brad2 }));
             Assert.That(collection.ReplyTo, Is.EquivalentTo(new [] { charlie2 }));
+            Assert.That(collection["Custom"], Is.EqualTo("New Value"));
         });
     }
 
