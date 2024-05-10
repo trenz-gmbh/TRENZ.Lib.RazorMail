@@ -35,6 +35,11 @@ public static class MailMessageExtensions
         mailMessage.Cc.AddRange(razorMessage.Headers.CarbonCopy.Select(x => x.ToMailboxAddress()));
         mailMessage.Bcc.AddRange(razorMessage.Headers.BlindCarbonCopy.Select(x => x.ToMailboxAddress()));
         mailMessage.ReplyTo.AddRange(razorMessage.Headers.ReplyTo.Select(x => x.ToMailboxAddress()));
+
+        foreach (var (name, value) in razorMessage.Headers.NonAddressHeaders)
+        {
+            mailMessage.Headers.Add(name, value.ToString());
+        }
     }
 
     private static void SetMailContent(RazorMailMessage razorMessage, IMailKitMailMessage mailMessage)

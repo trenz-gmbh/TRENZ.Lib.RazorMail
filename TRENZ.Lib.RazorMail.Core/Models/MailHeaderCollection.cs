@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace TRENZ.Lib.RazorMail.Models;
@@ -7,15 +8,47 @@ namespace TRENZ.Lib.RazorMail.Models;
 /// <summary>
 /// Represents a collection of mail headers.
 /// </summary>
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global",
+    Justification = "Keys may be checked from outside the class.")]
 public class MailHeaderCollection : Dictionary<string, object>
 {
+    /// <summary>
+    /// The key for the "To" address.
+    /// </summary>
+    public const string ToKey = "To";
+
+    /// <summary>
+    /// The key for the "CC" address.
+    /// </summary>
+    public const string CcKey = "CC";
+
+    /// <summary>
+    /// The key for the "BCC" address.
+    /// </summary>
+    public const string BccKey = "BCC";
+
+    /// <summary>
+    /// The key for the "Reply-To" address.
+    /// </summary>
+    public const string ReplyToKey = "Reply-To";
+
+    /// <summary>
+    /// The key for the "From" address.
+    /// </summary>
+    public const string FromKey = "From";
+
+    /// <summary>
+    /// The keys for the mail addresses in the collection.
+    /// </summary>
+    public static readonly string[] AddressKeys = [ToKey, CcKey, BccKey, ReplyToKey, FromKey];
+
     /// <summary>
     /// The recipients of the mail message.
     /// </summary>
     public IEnumerable<MailAddress> Recipients
     {
-        get => GetAddresses("To");
-        set => SetAddresses("To", value);
+        get => GetAddresses(ToKey);
+        set => SetAddresses(ToKey, value);
     }
 
     /// <summary>
@@ -23,8 +56,8 @@ public class MailHeaderCollection : Dictionary<string, object>
     /// </summary>
     public IEnumerable<MailAddress> CarbonCopy
     {
-        get => GetAddresses("CC");
-        set => SetAddresses("CC", value);
+        get => GetAddresses(CcKey);
+        set => SetAddresses(CcKey, value);
     }
 
     /// <summary>
@@ -32,8 +65,8 @@ public class MailHeaderCollection : Dictionary<string, object>
     /// </summary>
     public IEnumerable<MailAddress> BlindCarbonCopy
     {
-        get => GetAddresses("BCC");
-        set => SetAddresses("BCC", value);
+        get => GetAddresses(BccKey);
+        set => SetAddresses(BccKey, value);
     }
 
     /// <summary>
@@ -41,8 +74,8 @@ public class MailHeaderCollection : Dictionary<string, object>
     /// </summary>
     public IEnumerable<MailAddress> ReplyTo
     {
-        get => GetAddresses("Reply-To");
-        set => SetAddresses("Reply-To", value);
+        get => GetAddresses(ReplyToKey);
+        set => SetAddresses(ReplyToKey, value);
     }
 
     /// <summary>
@@ -52,7 +85,7 @@ public class MailHeaderCollection : Dictionary<string, object>
     {
         get
         {
-            if (TryGetValue("From", out var value) && value is MailAddress address)
+            if (TryGetValue(FromKey, out var value) && value is MailAddress address)
                 return address;
 
             return null;
@@ -60,9 +93,9 @@ public class MailHeaderCollection : Dictionary<string, object>
         set
         {
             if (value is null)
-                Remove("From");
+                Remove(FromKey);
             else
-                this["From"] = value;
+                this[FromKey] = value;
         }
     }
 
@@ -110,7 +143,8 @@ public class MailHeaderCollection : Dictionary<string, object>
     /// Adds multiple blind carbon copy recipients to the mail message.
     /// </summary>
     /// <param name="addresses">The recipient's mail addresses.</param>
-    public void AddBlindCarbonCopy(IEnumerable<MailAddress> addresses) => BlindCarbonCopy = BlindCarbonCopy.Concat(addresses);
+    public void AddBlindCarbonCopy(IEnumerable<MailAddress> addresses) =>
+        BlindCarbonCopy = BlindCarbonCopy.Concat(addresses);
 
     /// <summary>
     /// Adds a reply-to address to the mail message.
@@ -123,4 +157,8 @@ public class MailHeaderCollection : Dictionary<string, object>
     /// </summary>
     /// <param name="addresses">The reply-to addresses.</param>
     public void AddReplyTo(IEnumerable<MailAddress> addresses) => ReplyTo = ReplyTo.Concat(addresses);
+
+    public IReadOnlyDictionary<string, object> NonAddressHeaders => this
+        .Where(x => !AddressKeys.Contains(x.Key))
+        .ToDictionary(x => x.Key, x => x.Value);
 }

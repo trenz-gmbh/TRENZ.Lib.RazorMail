@@ -46,6 +46,11 @@ public static class SystemNetMailMessageExtensions
 
         foreach (var item in razorMessage.Headers.ReplyTo)
             systemNetMessage.ReplyToList.Add(item.ToMailAddress());
+
+        foreach (var (name, value) in razorMessage.Headers.NonAddressHeaders)
+        {
+            systemNetMessage.Headers.Add(name, value.ToString());
+        }
     }
 
     private static void SetMailContent(RazorMailMessage razorMessage, SystemNetMailMessage systemNetMessage)
