@@ -80,15 +80,16 @@ public class MailHeaderCollectionTests
     }
 
     [Test]
-    public void TestHeaderKeyCasesArePreserved()
+    [TestCase("Key")]
+    [TestCase("key")]
+    [TestCase("KEY")]
+    public void TestHeaderKeyCasesArePreserved(string key)
     {
         var collection = new MailHeaderCollection
         {
-            { "Key", "value" },
-            { "key2", "value" },
-            { "KEY3", "value" },
+            { key, "value" },
         };
 
-        Assert.That(collection.Keys, Is.EquivalentTo(new [] { "Key", "key2", "KEY3"}));
+        Assert.That(collection.Keys, Is.EquivalentTo(new [] { key }));
     }
 }
