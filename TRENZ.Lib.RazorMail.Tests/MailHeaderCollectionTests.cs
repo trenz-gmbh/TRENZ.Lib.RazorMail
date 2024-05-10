@@ -14,7 +14,7 @@ public class MailHeaderCollectionTests
             { "key", "value" },
         };
 
-        collection.Append(new()
+        collection.Append(new MailHeaderCollection
         {
             { "key", "new value" },
         });
@@ -46,7 +46,7 @@ public class MailHeaderCollectionTests
             ReplyTo = [charlie],
         };
 
-        collection.Append(new()
+        collection.Append(new MailHeaderCollection
         {
             From = me2,
             Recipients = [you2],
