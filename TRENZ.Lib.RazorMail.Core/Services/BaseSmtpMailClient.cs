@@ -23,50 +23,46 @@ public abstract class BaseSmtpMailClient(IOptions<SmtpAccount> accountOptions) :
     protected SmtpAccount Account => accountOptions.Value;
 
     /// <inheritdoc />
-    public MailAddress? DefaultFrom { get; set; }
+    public MailHeaderCollection DefaultHeaders { get; } = new();
 
     /// <inheritdoc />
-    public IEnumerable<MailAddress> DefaultRecipients { get; set; } = [];
+    public MailAddress? DefaultFrom {
+        get => DefaultHeaders.From;
+        set => DefaultHeaders.From = value;
+    }
 
     /// <inheritdoc />
-    public IEnumerable<MailAddress> DefaultCc { get; set; } = [];
+    public IEnumerable<MailAddress> DefaultRecipients {
+        get => DefaultHeaders.Recipients;
+        set => DefaultHeaders.Recipients = value;
+    }
 
     /// <inheritdoc />
-    public IEnumerable<MailAddress> DefaultBcc { get; set; } = [];
+    public IEnumerable<MailAddress> DefaultCc {
+        get => DefaultHeaders.CarbonCopy;
+        set => DefaultHeaders.CarbonCopy = value;
+    }
 
     /// <inheritdoc />
-    public IEnumerable<MailAddress> DefaultReplyTo { get; set; } = [];
+    public IEnumerable<MailAddress> DefaultBcc {
+        get => DefaultHeaders.BlindCarbonCopy;
+        set => DefaultHeaders.BlindCarbonCopy = value;
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<MailAddress> DefaultReplyTo {
+        get => DefaultHeaders.ReplyTo;
+        set => DefaultHeaders.ReplyTo = value;
+    }
 
     /// <inheritdoc />
     public Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
-        AppendDefaults(message.Headers);
+        message.Headers.Append(DefaultHeaders);
 
         ThrowIfInvalid(message);
 
         return SendInternalAsync(message, cancellationToken);
-    }
-
-    /// <summary>
-    /// Adds the default values to the mail headers.
-    /// </summary>
-    /// <param name="mailHeaders">The mail headers to update.</param>
-    protected virtual void AppendDefaults(MailHeaderCollection mailHeaders)
-    {
-        if (DefaultFrom is not null)
-            mailHeaders.From ??= DefaultFrom;
-
-        if (DefaultRecipients.Any())
-            mailHeaders.AddRecipient(DefaultRecipients);
-
-        if (DefaultCc.Any())
-            mailHeaders.AddCarbonCopy(DefaultCc);
-
-        if (DefaultBcc.Any())
-            mailHeaders.AddBlindCarbonCopy(DefaultBcc);
-
-        if (DefaultReplyTo.Any())
-            mailHeaders.AddReplyTo(DefaultReplyTo);
     }
 
     protected virtual void ThrowIfInvalid(MailMessage message)

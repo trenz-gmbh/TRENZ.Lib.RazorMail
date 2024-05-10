@@ -12,6 +12,11 @@ namespace TRENZ.Lib.RazorMail.Interfaces;
 public interface IMailClient
 {
     /// <summary>
+    /// The default headers to add to each mail message.
+    /// </summary>
+    public MailHeaderCollection DefaultHeaders { get; }
+
+    /// <summary>
     /// The default "From" address. Can be overriden by the message.
     /// </summary>
     /// <remarks>
