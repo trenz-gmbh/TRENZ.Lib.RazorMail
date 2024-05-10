@@ -170,7 +170,7 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     /// </summary>
     /// <param name="other">The collection to append.</param>
     /// <returns>The current instance.</returns>
-    public MailHeaderCollection Append(MailHeaderCollection other)
+    public MailHeaderCollection AppendFrom(MailHeaderCollection other)
     {
         From ??= other.From;
 
@@ -182,6 +182,19 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
         foreach (var (key, value) in other.NonAddressHeaders)
             if (!ContainsKey(key))
                 this[key] = value;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Overwrites the values of this collection with the values from <paramref name="other"/>.
+    /// </summary>
+    /// <param name="other">The collection to overwrite with.</param>
+    /// <returns>The current instance.</returns>
+    public MailHeaderCollection OverwriteFrom(MailHeaderCollection other)
+    {
+        foreach (var (key, value) in other)
+            this[key] = value;
 
         return this;
     }

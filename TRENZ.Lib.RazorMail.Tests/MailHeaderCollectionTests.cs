@@ -14,7 +14,7 @@ public class MailHeaderCollectionTests
             { "key", "value" },
         };
 
-        collection.Append(new MailHeaderCollection
+        collection.AppendFrom(new MailHeaderCollection
         {
             { "key", "new value" },
         });
@@ -46,7 +46,7 @@ public class MailHeaderCollectionTests
             ReplyTo = [charlie],
         };
 
-        collection.Append(new MailHeaderCollection
+        collection.AppendFrom(new MailHeaderCollection
         {
             From = me2,
             Recipients = [you2],
@@ -62,6 +62,49 @@ public class MailHeaderCollectionTests
             Assert.That(collection.CarbonCopy, Is.EquivalentTo(new [] { anna, anna2 }));
             Assert.That(collection.BlindCarbonCopy, Is.EquivalentTo(new [] { brad, brad2 }));
             Assert.That(collection.ReplyTo, Is.EquivalentTo(new [] { charlie, charlie2 }));
+        });
+    }
+
+    [Test]
+    public void TestOverwriteExistingValues()
+    {
+        var me = new MailAddress("me@example.test");
+        var you = new MailAddress("you@example.test");
+        var anna = new MailAddress("anna@example.test");
+        var brad = new MailAddress("brad@example.test");
+        var charlie = new MailAddress("charlie@example.test");
+
+        var me2 = new MailAddress("me2@example.test");
+        var you2 = new MailAddress("you2@example.test");
+        var anna2 = new MailAddress("anna2@example.test");
+        var brad2 = new MailAddress("brad2@example.test");
+        var charlie2 = new MailAddress("charlie2@example.test");
+
+        var collection = new MailHeaderCollection
+        {
+            From = me,
+            Recipients = [you],
+            CarbonCopy = [anna],
+            BlindCarbonCopy = [brad],
+            ReplyTo = [charlie],
+        };
+
+        collection.OverwriteFrom(new MailHeaderCollection
+        {
+            From = me2,
+            Recipients = [you2],
+            CarbonCopy = [anna2],
+            BlindCarbonCopy = [brad2],
+            ReplyTo = [charlie2],
+        });
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(collection.From, Is.EqualTo(me2));
+            Assert.That(collection.Recipients, Is.EquivalentTo(new [] { you2 }));
+            Assert.That(collection.CarbonCopy, Is.EquivalentTo(new [] { anna2 }));
+            Assert.That(collection.BlindCarbonCopy, Is.EquivalentTo(new [] { brad2 }));
+            Assert.That(collection.ReplyTo, Is.EquivalentTo(new [] { charlie2 }));
         });
     }
 
