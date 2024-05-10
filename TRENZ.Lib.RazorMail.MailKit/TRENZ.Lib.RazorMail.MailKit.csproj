@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <RootNamespace>TRENZ.Lib.RazorMail</RootNamespace>
-    </PropertyGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" />
       <PackageReference Include="MailKit" Version="4.5.0" />
     </ItemGroup>
 

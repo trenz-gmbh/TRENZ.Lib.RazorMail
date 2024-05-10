@@ -1,20 +1,32 @@
-﻿using System.IO;
+﻿namespace TRENZ.Lib.RazorMail.Models;
 
-namespace TRENZ.Lib.RazorMail.Models;
-
+/// <summary>
+/// A mail attachment.
+/// </summary>
 public class MailAttachment
 {
-    public byte[] FileData { get; set; }
-    public string Filename { get; set; }
-    public string ContentType { get; set; }
+    /// <summary>
+    /// The data of the file.
+    /// </summary>
+    public required byte[] FileData { get; set; }
 
-    public MailAttachment(byte[] fileData, string filename, string contentType)
-    {
-        FileData = fileData;
-        Filename = filename;
-        ContentType = contentType;
-    }
+    /// <summary>
+    /// The name of the file.
+    /// </summary>
+    public required string FileName { get; set; }
 
+    /// <summary>
+    /// The content type of the file.
+    /// </summary>
+    public required string ContentType { get; set; }
+
+    /// <summary>
+    /// The content ID of the attachment.
+    /// </summary>
     public string? ContentId { get; set; }
+
+    /// <summary>
+    /// Whether the attachment should be displayed inline.
+    /// </summary>
     public bool Inline { get; set; }
 }
