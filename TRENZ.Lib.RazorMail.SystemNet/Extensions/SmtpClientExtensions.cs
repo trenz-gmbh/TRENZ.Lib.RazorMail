@@ -3,7 +3,7 @@ using System.Net.Mail;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TRENZ.Lib.RazorMail.Extensions;
+namespace TRENZ.Lib.RazorMail.SystemNet.Extensions;
 
 public static class SmtpClientExtensions
 {

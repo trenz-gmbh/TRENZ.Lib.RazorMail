@@ -11,13 +11,13 @@ using Microsoft.Extensions.Options;
 
 using MimeKit;
 
-using TRENZ.Lib.RazorMail.Extensions;
+using TRENZ.Lib.RazorMail.MailKit.Extensions;
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.Services;
 
 using RazorMailMessage = TRENZ.Lib.RazorMail.Models.MailMessage;
 
-namespace TRENZ.Lib.RazorMail;
+namespace TRENZ.Lib.RazorMail.MailKit;
 
 public class MailKitMailClient(IOptions<SmtpAccount> accountOptions, ILogger<MailKitMailClient> logger)
     : BaseSmtpMailClient(accountOptions)

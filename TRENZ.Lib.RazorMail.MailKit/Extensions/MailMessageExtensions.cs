@@ -2,7 +2,7 @@
 
 using MimeKit;
 
-namespace TRENZ.Lib.RazorMail.Extensions;
+namespace TRENZ.Lib.RazorMail.MailKit.Extensions;
 
 using RazorMailMessage = Models.MailMessage;
 using MailKitMailMessage = MimeMessage;

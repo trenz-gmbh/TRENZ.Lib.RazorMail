@@ -8,13 +8,13 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using TRENZ.Lib.RazorMail.Extensions;
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.Services;
+using TRENZ.Lib.RazorMail.SystemNet.Extensions;
 
 using RazorMailMessage = TRENZ.Lib.RazorMail.Models.MailMessage;
 
-namespace TRENZ.Lib.RazorMail;
+namespace TRENZ.Lib.RazorMail.SystemNet;
 
 public class SystemNetMailClient(IOptions<SmtpAccount> accountOptions, ILogger<SystemNetMailClient> logger) : BaseSmtpMailClient(accountOptions)
 {

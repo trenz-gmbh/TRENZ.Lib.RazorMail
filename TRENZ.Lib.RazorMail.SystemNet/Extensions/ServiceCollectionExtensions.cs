@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Models;
 
-namespace TRENZ.Lib.RazorMail.Extensions;
+namespace TRENZ.Lib.RazorMail.SystemNet.Extensions;
 
 public static class ServiceCollectionExtensions
 {

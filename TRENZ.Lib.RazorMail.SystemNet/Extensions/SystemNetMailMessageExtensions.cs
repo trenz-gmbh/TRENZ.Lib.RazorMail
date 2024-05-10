@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using RazorMailMessage = TRENZ.Lib.RazorMail.Models.MailMessage;
 using SystemNetMailMessage = System.Net.Mail.MailMessage;
 
-namespace TRENZ.Lib.RazorMail.Extensions;
+namespace TRENZ.Lib.RazorMail.SystemNet.Extensions;
 
 /// <summary>
 /// Extension methods for <see cref="RazorMailMessage"/> to convert it to <see cref="SystemNetMailMessage"/>.

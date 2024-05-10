@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using RazorMailAttachment = TRENZ.Lib.RazorMail.Models.MailAttachment;
 using SystemNetMailAttachment = System.Net.Mail.Attachment;
 
-namespace TRENZ.Lib.RazorMail.Extensions;
+namespace TRENZ.Lib.RazorMail.SystemNet.Extensions;
 
 public static class MailAttachmentExtensions
 {

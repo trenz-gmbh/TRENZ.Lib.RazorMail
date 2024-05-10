@@ -1,4 +1,6 @@
 using TRENZ.Lib.RazorMail.Extensions;
+using TRENZ.Lib.RazorMail.MailKit.Extensions;
+using TRENZ.Lib.RazorMail.SystemNet.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

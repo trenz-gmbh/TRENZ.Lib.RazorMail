@@ -2,7 +2,7 @@ using MimeKit;
 
 using TRENZ.Lib.RazorMail.Models;
 
-namespace TRENZ.Lib.RazorMail.Extensions;
+namespace TRENZ.Lib.RazorMail.MailKit.Extensions;
 
 public static class MailAddressExtensions
 {
