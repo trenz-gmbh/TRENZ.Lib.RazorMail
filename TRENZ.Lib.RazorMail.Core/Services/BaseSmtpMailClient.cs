@@ -26,36 +26,6 @@ public abstract class BaseSmtpMailClient(IOptions<SmtpAccount> accountOptions) :
     public MailHeaderCollection DefaultHeaders { get; } = new();
 
     /// <inheritdoc />
-    public MailAddress? DefaultFrom {
-        get => DefaultHeaders.From;
-        set => DefaultHeaders.From = value;
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<MailAddress> DefaultRecipients {
-        get => DefaultHeaders.Recipients;
-        set => DefaultHeaders.Recipients = value;
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<MailAddress> DefaultCc {
-        get => DefaultHeaders.CarbonCopy;
-        set => DefaultHeaders.CarbonCopy = value;
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<MailAddress> DefaultBcc {
-        get => DefaultHeaders.BlindCarbonCopy;
-        set => DefaultHeaders.BlindCarbonCopy = value;
-    }
-
-    /// <inheritdoc />
-    public IEnumerable<MailAddress> DefaultReplyTo {
-        get => DefaultHeaders.ReplyTo;
-        set => DefaultHeaders.ReplyTo = value;
-    }
-
-    /// <inheritdoc />
     public Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
         message.Headers.AppendFrom(DefaultHeaders);
