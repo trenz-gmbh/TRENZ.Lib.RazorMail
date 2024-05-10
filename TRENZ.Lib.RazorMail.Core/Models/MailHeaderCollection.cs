@@ -159,6 +159,6 @@ public class MailHeaderCollection : Dictionary<string, object>
     public void AddReplyTo(IEnumerable<MailAddress> addresses) => ReplyTo = ReplyTo.Concat(addresses);
 
     public IReadOnlyDictionary<string, object> NonAddressHeaders => this
-        .Where(x => !AddressKeys.Contains(x.Key))
+        .ExceptBy(AddressKeys, x => x.Key)
         .ToDictionary(x => x.Key, x => x.Value);
 }
