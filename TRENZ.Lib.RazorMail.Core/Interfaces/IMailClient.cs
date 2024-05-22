@@ -12,33 +12,53 @@ namespace TRENZ.Lib.RazorMail.Interfaces;
 public interface IMailClient
 {
     /// <summary>
+    /// The default headers to add to each mail message.
+    /// </summary>
+    public MailHeaderCollection DefaultHeaders { get; }
+
+    /// <summary>
     /// The default "From" address. Can be overriden by the message.
     /// </summary>
     /// <remarks>
     /// If this is <see langword="null"/>, it must be set in the <see cref="MailMessage"/>, otherwise
     /// <see cref="SendAsync"/> will throw a <see cref="System.InvalidOperationException"/>.
     /// </remarks>
-    MailAddress? DefaultFrom { get; set; }
+    public MailAddress? DefaultFrom {
+        get => DefaultHeaders.From;
+        set => DefaultHeaders.From = value;
+    }
 
     /// <summary>
     /// The default set of recipients. Will be added to the message recipients.
     /// </summary>
-    IEnumerable<MailAddress> DefaultRecipients { get; set; }
+    public IEnumerable<MailAddress> DefaultRecipients {
+        get => DefaultHeaders.Recipients;
+        set => DefaultHeaders.Recipients = value;
+    }
 
     /// <summary>
     /// The default set of CC recipients. Will be added to the message CC recipients.
     /// </summary>
-    IEnumerable<MailAddress> DefaultCc { get; set; }
+    public IEnumerable<MailAddress> DefaultCc {
+        get => DefaultHeaders.CarbonCopy;
+        set => DefaultHeaders.CarbonCopy = value;
+    }
 
     /// <summary>
     /// The default set of BCC recipients. Will be added to the message BCC recipients.
     /// </summary>
-    IEnumerable<MailAddress> DefaultBcc { get; set; }
+    public IEnumerable<MailAddress> DefaultBcc {
+        get => DefaultHeaders.BlindCarbonCopy;
+        set => DefaultHeaders.BlindCarbonCopy = value;
+    }
 
     /// <summary>
     /// The default set of reply-to addresses. Will be added to the message reply-to addresses.
     /// </summary>
-    IEnumerable<MailAddress> DefaultReplyTo { get; set; }
+    public IEnumerable<MailAddress> DefaultReplyTo {
+        get => DefaultHeaders.ReplyTo;
+        set => DefaultHeaders.ReplyTo = value;
+    }
 
     /// <summary>
     /// Sends an email message asynchronously.

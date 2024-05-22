@@ -10,7 +10,7 @@ namespace TRENZ.Lib.RazorMail.Models;
 /// </summary>
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global",
     Justification = "Keys may be checked from outside the class.")]
-public class MailHeaderCollection : Dictionary<string, object>
+public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
 {
     /// <summary>
     /// The key for the "To" address.
@@ -158,7 +158,44 @@ public class MailHeaderCollection : Dictionary<string, object>
     /// <param name="addresses">The reply-to addresses.</param>
     public void AddReplyTo(IEnumerable<MailAddress> addresses) => ReplyTo = ReplyTo.Concat(addresses);
 
+    /// <summary>
+    /// Gets the headers that are not mail addresses and therefore have no getter/setter.
+    /// </summary>
     public IReadOnlyDictionary<string, object> NonAddressHeaders => this
         .ExceptBy(AddressKeys, x => x.Key)
         .ToDictionary(x => x.Key, x => x.Value);
+
+    /// <summary>
+    /// Appends <paramref name="other"/> to this collection without overwriting existing values.
+    /// </summary>
+    /// <param name="other">The collection to append.</param>
+    /// <returns>The current instance.</returns>
+    public MailHeaderCollection AppendRange(MailHeaderCollection other)
+    {
+        From ??= other.From;
+
+        AddRecipient(other.Recipients);
+        AddCarbonCopy(other.CarbonCopy);
+        AddBlindCarbonCopy(other.BlindCarbonCopy);
+        AddReplyTo(other.ReplyTo);
+
+        foreach (var (key, value) in other.NonAddressHeaders)
+            if (!ContainsKey(key))
+                this[key] = value;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Overwrites the values of this collection with the values from <paramref name="other"/>.
+    /// </summary>
+    /// <param name="other">The collection to overwrite with.</param>
+    /// <returns>The current instance.</returns>
+    public MailHeaderCollection OverwriteWith(MailHeaderCollection other)
+    {
+        foreach (var (key, value) in other)
+            this[key] = value;
+
+        return this;
+    }
 }
