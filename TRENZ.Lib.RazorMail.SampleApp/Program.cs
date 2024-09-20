@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
+using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -18,7 +19,7 @@ builder.Services.AddSingleton<DiagnosticSource>(listener);
 builder.Services.AddMvcCore()
                 .AddRazorViewEngine();
 
-builder.Services.AddTransient<IRazorEmailRenderer, RazorEmailRenderer>();
+builder.Services.AddTransient<IMailRenderer, MailRenderer>();
 
 builder.Services.AddHostedService<Worker>();
 
@@ -34,11 +35,11 @@ class Worker : IHostedService
     // {
     //     Engine = engine;
     // }
-    public IRazorEmailRenderer EmailRenderer { get; }
+    public IMailRenderer MailRenderer { get; }
     
-    public Worker(IRazorEmailRenderer emailRenderer)
+    public Worker(IMailRenderer mailRenderer)
     {
-        EmailRenderer = emailRenderer;
+        MailRenderer = mailRenderer;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
