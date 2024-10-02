@@ -49,18 +49,9 @@ public static class SystemNetMailMessageExtensions
         foreach (var item in razorMessage.Headers.ReplyTo)
             systemNetMessage.ReplyToList.Add(item.ToMailAddress());
         
-        systemNetMessage.Headers["Importance"] = razorMessage.Headers.Importance switch
-        {
-            MailImportance.Low or MailImportance.High => razorMessage.Headers.Importance.ToString(),
-            _ => MailImportance.Normal.ToString()
-        };
+        systemNetMessage.Headers["Importance"] = razorMessage.Headers.Importance.ToImportanceHeaderValue();
 
-        systemNetMessage.Headers["X-Priority"] = razorMessage.Headers.Importance switch
-        {
-            MailImportance.Low => "4",
-            MailImportance.High => "2",
-            _ => "3"
-        };
+        systemNetMessage.Headers["X-Priority"] = razorMessage.Headers.Importance.ToXPriorityHeaderValue();
 
         foreach (var (name, value) in razorMessage.Headers.NonSpecificHandledHeaders)
         {
