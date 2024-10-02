@@ -2,6 +2,8 @@
 
 using JetBrains.Annotations;
 
+using TRENZ.Lib.RazorMail.Models;
+
 using RazorMailMessage = TRENZ.Lib.RazorMail.Models.MailMessage;
 using SystemNetMailMessage = System.Net.Mail.MailMessage;
 
@@ -46,8 +48,21 @@ public static class SystemNetMailMessageExtensions
 
         foreach (var item in razorMessage.Headers.ReplyTo)
             systemNetMessage.ReplyToList.Add(item.ToMailAddress());
+        
+        systemNetMessage.Headers["Importance"] = razorMessage.Headers.Importance switch
+        {
+            MailImportance.Low or MailImportance.High => razorMessage.Headers.Importance.ToString(),
+            _ => MailImportance.Normal.ToString()
+        };
 
-        foreach (var (name, value) in razorMessage.Headers.NonAddressHeaders)
+        systemNetMessage.Headers["X-Priority"] = razorMessage.Headers.Importance switch
+        {
+            MailImportance.Low => "4",
+            MailImportance.High => "2",
+            _ => "3"
+        };
+
+        foreach (var (name, value) in razorMessage.Headers.NonSpecificHandledHeaders)
         {
             systemNetMessage.Headers.Add(name, value.ToString());
         }
