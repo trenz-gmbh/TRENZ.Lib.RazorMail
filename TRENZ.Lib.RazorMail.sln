@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 		README.md = README.md
 		docker-compose.yml = docker-compose.yml
 		Directory.Packages.props = Directory.Packages.props
+		CHANGELOG.md = CHANGELOG.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.SampleWebApi", "TRENZ.Lib.RazorMail.SampleWebApi\TRENZ.Lib.RazorMail.SampleWebApi.csproj", "{3B4E6149-BD59-48A5-A4A5-68293CE9FD71}"
