@@ -1,5 +1,5 @@
 # Via HTTPS and System.Net.Mail
-POST https://localhost:7141/mail/SendWithSystemNet
+POST http://localhost:5102/mail/SendWithSystemNet
 Content-Type: application/json
 
 {

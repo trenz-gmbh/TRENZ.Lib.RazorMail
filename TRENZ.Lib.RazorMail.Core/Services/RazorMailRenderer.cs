@@ -26,7 +26,7 @@ namespace TRENZ.Lib.RazorMail.Services;
 /// <summary>
 /// via https://scottsauber.com/2018/07/07/walkthrough-creating-an-html-email-template-with-razor-and-razor-class-libraries-and-rendering-it-from-a-net-standard-class-library/
 /// </summary>
-public class MailRenderer(
+public class RazorMailRenderer(
     [SuppressMessage("ReSharper", "SuggestBaseTypeForParameterInConstructor",
         Justification = "Only IRazorViewEngine is registered in the DI container.")]
     IRazorViewEngine viewEngine,
