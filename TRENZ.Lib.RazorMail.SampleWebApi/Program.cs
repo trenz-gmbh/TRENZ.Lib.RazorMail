@@ -22,5 +22,5 @@ return;
 
 static void ConfigureClient(IServiceProvider sp, IMailClient client)
 {
-    client.DefaultHeaders.ReplyTo = [new MailAddress("noreply@example.com")];
+    client.DefaultHeaders.ReplyTo = [new MailAddress("support@example.com")];
 }
