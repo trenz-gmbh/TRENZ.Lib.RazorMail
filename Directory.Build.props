@@ -16,7 +16,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageProjectUrl>https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail</PackageProjectUrl>
 
-        <RepositoryUrl>git@github.com:trenz-gmbh/TRENZ.Lib.RazorMail.git</RepositoryUrl>
+        <RepositoryUrl>https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <!-- needed for Source Link -->
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
