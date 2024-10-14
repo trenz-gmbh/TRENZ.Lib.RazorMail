@@ -1,19 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-      <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
+        <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" />
-      <PackageReference Include="Microsoft.SourceLink.GitHub">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
+        <PackageReference Include="JetBrains.Annotations" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <PropertyGroup Condition="$(Configuration) == 'Release'">
-        <Title>TRENZ.Lib.RazorMail.SystemNet</Title>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     </PropertyGroup>
 

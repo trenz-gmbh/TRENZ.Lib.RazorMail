@@ -6,14 +6,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TRENZ.Lib.RazorMail.MailKit\TRENZ.Lib.RazorMail.MailKit.csproj" />
-      <ProjectReference Include="..\TRENZ.Lib.RazorMail.SystemNet\TRENZ.Lib.RazorMail.SystemNet.csproj" />
-      <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
+        <ProjectReference Include="..\TRENZ.Lib.RazorMail.MailKit\TRENZ.Lib.RazorMail.MailKit.csproj" />
+        <ProjectReference Include="..\TRENZ.Lib.RazorMail.SystemNet\TRENZ.Lib.RazorMail.SystemNet.csproj" />
+        <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="Views\Sample.cshtml" />
-        
+        <None Include="Views\Sample.cshtml" />
+
         <Content Include="Views/Assets/the-swarm.png" CopyToOutputDirectory="Always" />
     </ItemGroup>
 
