@@ -1,4 +1,4 @@
-# Unreleased
+# 2.2.0
 
 - Added some badges to the README
 - Marked `AddRazorEmailRenderer` obsolete, use `AddRazorMailRenderer` instead

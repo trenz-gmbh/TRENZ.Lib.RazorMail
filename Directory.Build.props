@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Version>2.1.1</Version>
+        <Version>2.2.0</Version>
         <Description>Write e-mail templates in Razor syntax, and send them via System.Net.Mail or MailKit.</Description>
         <PackageTags>razor;email;mail;template;transactional;e-mail;system.net.mail;mailkit</PackageTags>
 
