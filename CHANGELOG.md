@@ -1,3 +1,7 @@
+# Unreleased
+
+- Added support for setting a message importance (`Importance`, `X-Priority`) #15
+
 # 2.2.0
 
 - Added some badges to the README
