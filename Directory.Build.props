@@ -12,7 +12,7 @@
         <PackageTags>razor;email;mail;template;transactional;e-mail;system.net.mail;mailkit</PackageTags>
 
         <Authors>TRENZ GmbH</Authors>
-        <Copyright>Copyright © 2024 TRENZ GmbH</Copyright>
+        <Copyright>Copyright © 2019-2024 TRENZ GmbH</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageProjectUrl>https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail</PackageProjectUrl>
