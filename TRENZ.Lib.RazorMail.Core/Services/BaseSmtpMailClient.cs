@@ -23,7 +23,7 @@ public abstract class BaseSmtpMailClient(IOptions<SmtpAccount> accountOptions) :
     protected SmtpAccount Account => accountOptions.Value;
 
     /// <inheritdoc />
-    public MailHeaderCollection DefaultHeaders { get; } = new();
+    public MailHeaderCollection DefaultHeaders { get; set; } = new();
 
     /// <inheritdoc />
     public Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)

@@ -18,7 +18,7 @@ public static class RazorMailServiceCollectionExtensions
         services.AddMvcCore()
             .AddRazorViewEngine();
 
-        services.AddTransient<IMailRenderer, MailRenderer>();
+        services.AddTransient<IMailRenderer, RazorMailRenderer>();
 
         return services;
     }
