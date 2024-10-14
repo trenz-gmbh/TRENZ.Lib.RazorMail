@@ -9,4 +9,9 @@
       <PackageReference Include="MailKit" Version="4.8.0" />
     </ItemGroup>
 
+    <PropertyGroup Condition="$(Configuration) == 'Release'">
+        <Title>TRENZ.Lib.RazorMail.MailKit</Title>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    </PropertyGroup>
+
 </Project>

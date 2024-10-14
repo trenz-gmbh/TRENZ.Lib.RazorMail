@@ -7,11 +7,22 @@
         <Version>2.1.0</Version>
     </PropertyGroup>
 
-    <PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <Description>Write e-mail templates in Razor syntax, and send them via System.Net.Mail or MailKit.</Description>
+        <PackageTags>razor;email;mail;template;transactional;e-mail;system.net.mail;mailkit</PackageTags>
+
         <Authors>TRENZ GmbH</Authors>
+        <Copyright>Copyright © 2024 TRENZ GmbH</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageProjectUrl>https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail</PackageProjectUrl>
-        <License>MIT</License>
+
         <RepositoryUrl>git@github.com:trenz-gmbh/TRENZ.Lib.RazorMail.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
+        <!-- needed for Source Link -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 </Project>

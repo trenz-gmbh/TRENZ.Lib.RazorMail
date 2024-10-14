@@ -8,4 +8,9 @@
       <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" />
     </ItemGroup>
 
+    <PropertyGroup Condition="$(Configuration) == 'Release'">
+        <Title>TRENZ.Lib.RazorMail.SystemNet</Title>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    </PropertyGroup>
+
 </Project>
