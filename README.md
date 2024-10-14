@@ -1,3 +1,9 @@
+![MIT License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+![Core NuGet Version](https://img.shields.io/nuget/v/TRENZ.Lib.RazorMail.Core?style=flat-square&label=Core)
+![MailKit NuGet Version](https://img.shields.io/nuget/v/TRENZ.Lib.RazorMail.MailKit?style=flat-square&label=MailKit)
+![SystemNet NuGet Version](https://img.shields.io/nuget/v/TRENZ.Lib.RazorMail.SystemNet?style=flat-square&label=SystemNet)
+![NuGet Downloads](https://img.shields.io/nuget/dt/TRENZ.Lib.RazorMail.Core?style=flat-square)
+
 # TRENZ.Lib.RazorMail
 ## Templated transactional e-mail using Razor
 
