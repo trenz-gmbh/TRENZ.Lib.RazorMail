@@ -3,11 +3,10 @@
         <TargetFramework>net8.0</TargetFramework>
 
         <Nullable>enable</Nullable>
-
-        <Version>2.1.0</Version>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PropertyGroup>
+        <Version>2.1.0</Version>
         <Description>Write e-mail templates in Razor syntax, and send them via System.Net.Mail or MailKit.</Description>
         <PackageTags>razor;email;mail;template;transactional;e-mail;system.net.mail;mailkit</PackageTags>
 
