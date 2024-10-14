@@ -1,3 +1,5 @@
+using System;
+
 using Microsoft.Extensions.DependencyInjection;
 
 using TRENZ.Lib.RazorMail.Interfaces;
@@ -7,10 +9,14 @@ namespace TRENZ.Lib.RazorMail.Extensions;
 
 public static class RazorMailServiceCollectionExtensions
 {
-    public static IServiceCollection AddRazorEmailRenderer(this IServiceCollection services)
+    [Obsolete("Use AddRazorMailRenderer instead.")]
+    public static IServiceCollection AddRazorEmailRenderer(this IServiceCollection services) =>
+        services.AddRazorMailRenderer();
+
+    public static IServiceCollection AddRazorMailRenderer(this IServiceCollection services)
     {
         services.AddMvcCore()
-                .AddRazorViewEngine();
+            .AddRazorViewEngine();
 
         services.AddTransient<IMailRenderer, MailRenderer>();
 
