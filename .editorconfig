@@ -1,2 +1,4 @@
+root = true
+
 [*.{cs,vb}]
 dotnet_separate_import_directive_groups = true
