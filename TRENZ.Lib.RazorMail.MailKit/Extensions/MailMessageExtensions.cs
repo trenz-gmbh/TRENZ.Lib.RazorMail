@@ -2,6 +2,8 @@
 
 using MimeKit;
 
+using TRENZ.Lib.RazorMail.Models;
+
 namespace TRENZ.Lib.RazorMail.MailKit.Extensions;
 
 using RazorMailMessage = Models.MailMessage;
@@ -36,7 +38,21 @@ public static class MailMessageExtensions
         mailMessage.Bcc.AddRange(razorMessage.Headers.BlindCarbonCopy.Select(x => x.ToMailboxAddress()));
         mailMessage.ReplyTo.AddRange(razorMessage.Headers.ReplyTo.Select(x => x.ToMailboxAddress()));
 
-        foreach (var (name, value) in razorMessage.Headers.NonAddressHeaders)
+        mailMessage.Importance = razorMessage.Headers.Importance switch
+        {
+            MailImportance.Low => MessageImportance.Low,
+            MailImportance.High => MessageImportance.High,
+            _ => MessageImportance.Normal
+        };
+
+        mailMessage.XPriority = razorMessage.Headers.Importance switch
+        {
+            MailImportance.Low => XMessagePriority.Low,
+            MailImportance.High => XMessagePriority.High,
+            _ => XMessagePriority.Normal
+        };
+
+        foreach (var (name, value) in razorMessage.Headers.NonSpecificHandledHeaders)
         {
             mailMessage.Headers.Add(name, value.ToString());
         }
