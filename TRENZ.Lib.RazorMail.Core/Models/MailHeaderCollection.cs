@@ -49,10 +49,10 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
 
     /// <summary>
     /// Keys for headers that the <see cref="BaseSmtpMailClient"/>
-    /// implementation must set explicitly. 
+    /// implementation must set explicitly.
     /// </summary>
     public static readonly string[] SpecificHandledHeaderKeys = [..AddressKeys, ImportanceKey];
-    
+
     /// <summary>
     /// The recipients of the mail message.
     /// </summary>
@@ -184,6 +184,7 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     /// <summary>
     /// Gets the headers that are not mail addresses and therefore have no getter/setter.
     /// </summary>
+    [Obsolete("This will be removed in a future version.")]
     public IReadOnlyDictionary<string, object> NonAddressHeaders => this
         .ExceptBy(AddressKeys, x => x.Key)
         .ToDictionary(x => x.Key, x => x.Value);
