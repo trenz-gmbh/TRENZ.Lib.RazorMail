@@ -185,7 +185,7 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     /// Gets the headers that are not mail addresses and therefore have no getter/setter.
     /// </summary>
     [Obsolete("This will be removed in a future version.")]
-    public IReadOnlyDictionary<string, object> NonAddressHeaders => this
+    private IReadOnlyDictionary<string, object> NonAddressHeaders => this
         .ExceptBy(AddressKeys, x => x.Key)
         .ToDictionary(x => x.Key, x => x.Value);
 
