@@ -12,9 +12,10 @@
       <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
     </ItemGroup>
 
-    
     <ItemGroup>
-<!--      <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="7.0.2" />-->
+      <None Update="Views\MyTemplate.cshtml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

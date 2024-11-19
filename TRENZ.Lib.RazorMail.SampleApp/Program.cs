@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 using TRENZ.Lib.RazorMail.Interfaces;
+using TRENZ.Lib.RazorMail.SampleApp.Models;
 using TRENZ.Lib.RazorMail.Services;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -17,7 +18,12 @@ builder.Services.AddSingleton<DiagnosticSource>(listener);
 // builder.Services.AddSingleton<DiagnosticSource>(sp => sp.GetRequiredService<DiagnosticListener>());
 
 builder.Services.AddMvcCore()
-                .AddRazorViewEngine();
+    .AddRazorViewEngine();
+
+// builder.Services.Configure<RazorViewEngineOptions>(o =>
+// {
+// o.vi
+// });
 
 builder.Services.AddTransient<IMailRenderer, MailRenderer>();
 
@@ -44,7 +50,11 @@ class Worker : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var model = new MyModel("Michelle");
+
+        var renderedMail = await MailRenderer.RenderAsync("MyTemplate", model, cancellationToken);
+        
+        
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
