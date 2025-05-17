@@ -68,7 +68,8 @@ public class RazorMailRenderer(
             Subject = viewContext.ViewData[MailTemplateBase<TModel>.SubjectKey] as string,
             HtmlBody = output.ToString(),
             Attachments =
-                (viewContext.ViewData[MailTemplateBase<TModel>.AttachmentsKey] as Dictionary<string, MailAttachment>)!,
+                viewContext.ViewData[MailTemplateBase<TModel>.AttachmentsKey] as Dictionary<string, MailAttachment> ??
+                [],
         };
     }
 
