@@ -38,9 +38,20 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     public const string FromKey = "From";
 
     /// <summary>
+    /// The key for the "Importance" header.
+    /// </summary>
+    public const string ImportanceKey = "Importance";
+
+    /// <summary>
     /// The keys for the mail addresses in the collection.
     /// </summary>
     public static readonly string[] AddressKeys = [ToKey, CcKey, BccKey, ReplyToKey, FromKey];
+
+    /// <summary>
+    /// Keys for headers that the <see cref="BaseSmtpMailClient"/>
+    /// implementation must set explicitly.
+    /// </summary>
+    public static readonly string[] SpecificHandledHeaderKeys = [..AddressKeys, ImportanceKey];
 
     /// <summary>
     /// The recipients of the mail message.
@@ -97,6 +108,18 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
             else
                 this[FromKey] = value;
         }
+    }
+
+    public MailImportance Importance
+    {
+        get
+        {
+            if (TryGetValue(ImportanceKey, out var value) && value is MailImportance importance)
+                return importance;
+
+            return MailImportance.Normal;
+        }
+        set => this[ImportanceKey] = value;
     }
 
     private IEnumerable<MailAddress> GetAddresses(string key)
@@ -161,8 +184,16 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     /// <summary>
     /// Gets the headers that are not mail addresses and therefore have no getter/setter.
     /// </summary>
-    public IReadOnlyDictionary<string, object> NonAddressHeaders => this
+    [Obsolete("This will be removed in a future version.")]
+    private IReadOnlyDictionary<string, object> NonAddressHeaders => this
         .ExceptBy(AddressKeys, x => x.Key)
+        .ToDictionary(x => x.Key, x => x.Value);
+
+    /// <summary>
+    /// Gets the headers that the <see cref="BaseSmtpMailClient"/> implementation should just iterate over.
+    /// </summary>
+    public IReadOnlyDictionary<string, object> NonSpecificHandledHeaders => this
+        .ExceptBy(SpecificHandledHeaderKeys, x => x.Key)
         .ToDictionary(x => x.Key, x => x.Value);
 
     /// <summary>
