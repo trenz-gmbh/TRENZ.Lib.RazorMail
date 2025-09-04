@@ -96,24 +96,44 @@ Or, to attach a file:
 ## Sending
 
 Depending on which NuGet package you've picked above, you get a backend for sending either via the classic
-`System.Net.Mail`, or via `MailKit`/MimeKit. In the code below, replace `YourMailSender` with either `SystemNetMailSender` or
-`MailKitMailSender`.
-
-To wrap it all up:
+`System.Net.Mail`, or via `MailKit`/MimeKit.
+We recommend leveraging `Microsoft.Extensions.DependencyInjection`, by calling the following convenience methods:
 
 ```csharp
-const string view = "Sample";
+services.AddRazorMailRenderer();
+
+services.AddMailKitMailClient();
+// or
+services.AddSystemNetMailClient();
+```
+
+You can also pass a callback to the mail clients to configure default headers (setting a global `From` header, for example).
+
+This is how you would actually render and send an e-mail:
+
+```csharp
+const string viewName = "Sample";
+
 // this is your model. If you're sending to multiple people, you may want to customize this per person.
 var model = new SampleModel(request.Salutation);
+
 // this renders your view (your e-mail template), with the above model as an argument).
-var renderedMail = await EmailRenderer.RenderAsync(view, model);
+IMailRenderer renderer = ...; // inject via DI, for example
+var content = await renderer.RenderAsync(viewName, model);
 
 // this wraps the rendered HTML and passes it to a service that handles sending.
 // You need someone to send from, and one or more recipients.
-var mail = new YourMailSender(from: request.From,
-                              to: new[] { (MailAddress)request.To }.ToList(),
-                              renderedMail);
+var mail = new MailMessage
+{
+    Headers = new()
+    {
+        Recipients = [request.To],
+        // here you can add CC, BCC and other headers
+    },
+    Content = content,
+};
 
 // this actually sends the e-mail
-await mail.SendAsync(SmtpAccount);
+IMailClient client = ...; // inject via DI or use MailKitMailClient or SystemNetMailClient directly
+await client.SendAsync(mail);
 ```
