@@ -12,6 +12,10 @@ but elevated with C# — you get `@foreach`, `@switch`, and so on, _and_ you get
 
 ## Installation
 
+> [!NOTE]
+> You currently need to create an ASP.NET app to use the razor mail renderer.
+> See [#7](https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail/issues/7) for more information.
+
 In NuGet, reference either the `TRENZ.Lib.RazorMail.SystemNet` or the `TRENZ.Lib.RazorMail.MailKit` package, depending
 on which `MailSender` backend you prefer. [MailKit](https://github.com/jstedfast/MailKit) is more modern and powerful,
 but `System.Net.Mail` comes built into .NET. There is no need to reference `TRENZ.Lib.RazorMail` directly.
@@ -108,6 +112,15 @@ services.AddSystemNetMailClient();
 ```
 
 You can also pass a callback to the mail clients to configure default headers (setting a global `From` header, for example).
+
+> [!NOTE]
+> The `IMailRenderer` is a scoped service.
+> This means you will either need to register your service as a scoped service or obtain a scope using this code:
+>
+> ```csharp
+> await using var scope = serviceProvider.CreateScopeAsync();
+> var renderer = scope.ServiceProvider.GetRequiredService<IMailRenderer>();
+> ```
 
 This is how you would actually render and send an e-mail:
 
