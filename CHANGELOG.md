@@ -1,6 +1,7 @@
 # Unreleased
 
-- Added support for setting a message importance (`Importance`, `X-Priority`) #15
+- Added support for setting a message importance (`Importance`, `X-Priority`) [#26](https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail/pull/26) by @chucker
+- Fixed a NRE when sending mails without attachments [#29](https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail/pull/30) by @ricardoboss
 
 # 2.2.0
 
