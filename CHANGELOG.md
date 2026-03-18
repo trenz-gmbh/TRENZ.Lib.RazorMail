@@ -1,4 +1,4 @@
-# Unreleased
+# 2.3.1
 
 - Security: Updated `MailKit` to 4.15.1
 
