@@ -34,6 +34,27 @@ dotnet add package TRENZ.Lib.RazorMail.MailKit
 
 ## Usage
 
+In your `Program.cs`:
+
+```csharp
+// use the default WebApplication builder (required for Razor engine)
+var builder = WebApplication.CreateBuilder(args);
+
+builder.AddControllers(); // NOT AddControllersWithViews()
+
+builder.Services.AddRazorMailRenderer();
+
+builder.Services.AddMailKitMailClient();
+// or
+builder.Services.AddSystemNetMailClient();
+
+var app = builder.Build();
+
+app.MapControllers();
+
+// ...
+```
+
 A simple template looks like so:
 
 ```cshtml
@@ -101,15 +122,6 @@ Or, to attach a file:
 
 Depending on which NuGet package you've picked above, you get a backend for sending either via the classic
 `System.Net.Mail`, or via `MailKit`/MimeKit.
-We recommend leveraging `Microsoft.Extensions.DependencyInjection`, by calling the following convenience methods:
-
-```csharp
-services.AddRazorMailRenderer();
-
-services.AddMailKitMailClient();
-// or
-services.AddSystemNetMailClient();
-```
 
 You can also pass a callback to the mail clients to configure default headers (setting a global `From` header, for example).
 
