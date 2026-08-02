@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Microsoft.Extensions.Options;
-
 using NUnit.Framework;
 
 using TRENZ.Lib.RazorMail.Interfaces;
@@ -13,20 +11,7 @@ namespace TRENZ.Lib.RazorMail.Tests;
 
 public class BaseSmtpMailClientTests
 {
-    private static CapturingMailClient CreateClient() => new(Options.Create(new SmtpAccount
-    {
-        Host = "localhost",
-        Port = 25,
-        TLS = false,
-        Login = "login",
-        Password = "password",
-    }));
-
-    private static MailMessage CreateMessage(MailHeaderCollection headers) => new()
-    {
-        Headers = headers,
-        Content = new MailContent { HtmlBody = "<p>Hello</p>" },
-    };
+    private static CapturingMailClient CreateClient() => new(TestSmtpAccounts.CreateOptions());
 
     private static string[] Emails(IEnumerable<MailAddress> addresses) => addresses.Select(a => a.Email).ToArray();
 
@@ -39,7 +24,7 @@ public class BaseSmtpMailClientTests
         defaults.DefaultRecipients = [new MailAddress("default-to@example.test")];
         defaults.DefaultCc = [new MailAddress("default-cc@example.test")];
 
-        var message = CreateMessage(new MailHeaderCollection
+        var message = TestMessages.Create(new MailHeaderCollection
         {
             Recipients = [new MailAddress("you@example.test")],
         });
@@ -77,7 +62,7 @@ public class BaseSmtpMailClientTests
             Recipients = [new MailAddress("you@example.test")],
         };
 
-        var message = CreateMessage(headers);
+        var message = TestMessages.Create(headers);
 
         await client.SendAsync(message);
 
@@ -104,7 +89,7 @@ public class BaseSmtpMailClientTests
         defaults.DefaultReplyTo = [new MailAddress("default-reply-to@example.test")];
         client.DefaultHeaders["X-Default"] = "yes";
 
-        var message = CreateMessage(new MailHeaderCollection
+        var message = TestMessages.Create(new MailHeaderCollection
         {
             Recipients = [new MailAddress("you@example.test")],
         });
@@ -133,7 +118,7 @@ public class BaseSmtpMailClientTests
         IMailClient defaults = client;
         defaults.DefaultFrom = new MailAddress("default-sender@example.test");
 
-        var message = CreateMessage(new MailHeaderCollection
+        var message = TestMessages.Create(new MailHeaderCollection
         {
             From = new MailAddress("explicit-sender@example.test"),
             Recipients = [new MailAddress("you@example.test")],
@@ -154,7 +139,7 @@ public class BaseSmtpMailClientTests
         var defaultRecipients = new List<MailAddress> { new("default-to@example.test") };
         defaults.DefaultRecipients = defaultRecipients;
 
-        var message = CreateMessage(new MailHeaderCollection
+        var message = TestMessages.Create(new MailHeaderCollection
         {
             Recipients = [new MailAddress("you@example.test")],
         });
