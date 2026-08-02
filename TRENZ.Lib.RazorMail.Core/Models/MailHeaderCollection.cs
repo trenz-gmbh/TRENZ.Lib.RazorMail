@@ -130,7 +130,12 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
         return addresses;
     }
 
-    private void SetAddresses(string key, IEnumerable<MailAddress> value) => this[key] = value;
+    /// <remarks>
+    /// The addresses are materialized before they are stored, so that no deferred LINQ iterator ever ends up in the
+    /// dictionary. Storing an iterator would keep a live reference to the source collection, which means later changes
+    /// to that source would retroactively change this collection.
+    /// </remarks>
+    private void SetAddresses(string key, IEnumerable<MailAddress> value) => this[key] = value.ToList();
 
     /// <summary>
     /// Adds a recipient to the mail message.
