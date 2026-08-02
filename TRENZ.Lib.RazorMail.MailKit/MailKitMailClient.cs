@@ -38,9 +38,20 @@ public class MailKitMailClient(IOptions<SmtpAccount> accountOptions, ILogger<Mai
     {
         var client = CreateSmtpClient();
 
-        await client.ConnectAsync(Account.Host, Account.Port, SecureSocketOptions.Auto, cancellationToken);
+        try
+        {
+            await client.ConnectAsync(Account.Host, Account.Port, SecureSocketOptions.Auto, cancellationToken);
 
-        await client.AuthenticateAsync(Account.Login, Account.Password, cancellationToken);
+            await client.AuthenticateAsync(Account.Login, Account.Password, cancellationToken);
+        }
+        catch
+        {
+            // the client may already hold an open socket, so release it eagerly instead
+            // of leaving an orphaned connection around until the finalizer runs
+            client.Dispose();
+
+            throw;
+        }
 
         return client;
     }
