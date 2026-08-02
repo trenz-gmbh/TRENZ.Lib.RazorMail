@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+using TRENZ.Lib.RazorMail.Services;
+
 namespace TRENZ.Lib.RazorMail.Models;
 
 /// <summary>
