@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Extensions.Options;
@@ -9,25 +8,11 @@ using NUnit.Framework;
 
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Models;
-using TRENZ.Lib.RazorMail.Services;
 
 namespace TRENZ.Lib.RazorMail.Tests;
 
 public class BaseSmtpMailClientTests
 {
-    private sealed class CapturingMailClient(IOptions<SmtpAccount> accountOptions)
-        : BaseSmtpMailClient(accountOptions)
-    {
-        public List<MailMessage> SentMessages { get; } = [];
-
-        protected override Task SendInternalAsync(MailMessage message, CancellationToken cancellationToken)
-        {
-            SentMessages.Add(message);
-
-            return Task.CompletedTask;
-        }
-    }
-
     private static CapturingMailClient CreateClient() => new(Options.Create(new SmtpAccount
     {
         Host = "localhost",
