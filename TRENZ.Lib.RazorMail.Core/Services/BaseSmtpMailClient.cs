@@ -26,13 +26,26 @@ public abstract class BaseSmtpMailClient(IOptions<SmtpAccount> accountOptions) :
     public MailHeaderCollection DefaultHeaders { get; set; } = new();
 
     /// <inheritdoc />
+    /// <remarks>
+    /// The <paramref name="message"/> passed in by the caller is never modified. The <see cref="DefaultHeaders"/> are
+    /// merged into a copy of its headers, so the same <see cref="MailMessage"/> instance can safely be sent more than
+    /// once without accumulating the defaults over and over.
+    /// </remarks>
     public Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
-        message.Headers.AppendRange(DefaultHeaders);
+        var mergedHeaders = new MailHeaderCollection()
+            .OverwriteWith(message.Headers)
+            .AppendRange(DefaultHeaders);
 
-        ThrowIfInvalid(message);
+        var mergedMessage = new MailMessage
+        {
+            Headers = mergedHeaders,
+            Content = message.Content,
+        };
 
-        return SendInternalAsync(message, cancellationToken);
+        ThrowIfInvalid(mergedMessage);
+
+        return SendInternalAsync(mergedMessage, cancellationToken);
     }
 
     protected virtual void ThrowIfInvalid(MailMessage message)

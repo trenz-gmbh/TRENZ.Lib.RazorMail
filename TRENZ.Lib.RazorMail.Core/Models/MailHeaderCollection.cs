@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
+using TRENZ.Lib.RazorMail.Services;
+
 namespace TRENZ.Lib.RazorMail.Models;
 
 /// <summary>
@@ -125,12 +127,17 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     private IEnumerable<MailAddress> GetAddresses(string key)
     {
         if (!TryGetValue(key, out var value) || value is not IEnumerable<MailAddress> addresses)
-            return Array.Empty<MailAddress>();
+            return [];
 
         return addresses;
     }
 
-    private void SetAddresses(string key, IEnumerable<MailAddress> value) => this[key] = value;
+    /// <remarks>
+    /// The addresses are materialized before they are stored, so that no deferred LINQ iterator ever ends up in the
+    /// dictionary. Storing an iterator would keep a live reference to the source collection, which means later changes
+    /// to that source would retroactively change this collection.
+    /// </remarks>
+    private void SetAddresses(string key, IEnumerable<MailAddress> value) => this[key] = value.ToList();
 
     /// <summary>
     /// Adds a recipient to the mail message.

@@ -14,6 +14,12 @@ public interface IMailClient
     /// <summary>
     /// The default headers to add to each mail message.
     /// </summary>
+    /// <remarks>
+    /// Mail clients are registered as singletons, so these defaults are shared process-wide across every caller and
+    /// every request. Configure them once at the composition root; do not mutate them per-request (for example to add
+    /// a recipient for a single mail), as that would leak into unrelated messages sent concurrently or later. Use the
+    /// headers of the individual <see cref="MailMessage"/> for anything request-specific.
+    /// </remarks>
     public MailHeaderCollection DefaultHeaders { get; }
 
     /// <summary>
