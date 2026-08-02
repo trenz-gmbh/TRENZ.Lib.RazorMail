@@ -1,0 +1,35 @@
+version: 2
+
+updates:
+  # NuGet packages. Versions are managed centrally in Directory.Packages.props,
+  # which Dependabot reads directly, so a single entry at the repository root
+  # covers every project in the solution.
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: deps
+    groups:
+      # Bundle routine minor/patch bumps into one PR to keep the noise down.
+      # Major bumps stay on their own so they can be reviewed in isolation.
+      nuget-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # GitHub Actions used by .github/workflows/*.yml. These are pinned by major
+  # version (e.g. actions/checkout@v6), so this mainly surfaces major bumps.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: deps
+    groups:
+      github-actions:
+        patterns:
+          - "*"
