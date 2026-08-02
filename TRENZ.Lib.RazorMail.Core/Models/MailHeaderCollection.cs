@@ -127,7 +127,7 @@ public class MailHeaderCollection() : Dictionary<string, object>(StringComparer.
     private IEnumerable<MailAddress> GetAddresses(string key)
     {
         if (!TryGetValue(key, out var value) || value is not IEnumerable<MailAddress> addresses)
-            return Array.Empty<MailAddress>();
+            return [];
 
         return addresses;
     }
