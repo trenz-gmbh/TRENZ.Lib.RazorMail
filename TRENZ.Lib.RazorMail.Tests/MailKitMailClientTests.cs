@@ -6,32 +6,10 @@ using MailKit.Security;
 
 using NUnit.Framework;
 
-using TRENZ.Lib.RazorMail.Models;
-
 namespace TRENZ.Lib.RazorMail.Tests;
 
 public class MailKitMailClientTests
 {
-    private static MailMessage CreateValidMessage()
-    {
-        var headers = new MailHeaderCollection
-        {
-            From = new("sender@example.com", "Sender"),
-        };
-
-        headers.AddRecipient(new MailAddress("recipient@example.com", "Recipient"));
-
-        return new()
-        {
-            Headers = headers,
-            Content = new()
-            {
-                Subject = "Subject",
-                HtmlBody = "<p>Hello</p>",
-            },
-        };
-    }
-
     [Test]
     public void DisposesClientWhenAuthenticationFails()
     {
@@ -39,7 +17,7 @@ public class MailKitMailClientTests
         var fake = new FakeSmtpClient { AuthenticateException = expected };
         var sut = new TestableMailKitMailClient(fake);
 
-        var actual = Assert.ThrowsAsync<AuthenticationException>(() => sut.SendAsync(CreateValidMessage()));
+        var actual = Assert.ThrowsAsync<AuthenticationException>(() => sut.SendAsync(TestMessages.CreateValid()));
 
         Assert.Multiple(() =>
         {
@@ -58,7 +36,7 @@ public class MailKitMailClientTests
         var fake = new FakeSmtpClient { ConnectException = expected };
         var sut = new TestableMailKitMailClient(fake);
 
-        var actual = Assert.ThrowsAsync<SmtpProtocolException>(() => sut.SendAsync(CreateValidMessage()));
+        var actual = Assert.ThrowsAsync<SmtpProtocolException>(() => sut.SendAsync(TestMessages.CreateValid()));
 
         Assert.Multiple(() =>
         {
@@ -76,7 +54,7 @@ public class MailKitMailClientTests
         var fake = new FakeSmtpClient { AuthenticateException = new OperationCanceledException() };
         var sut = new TestableMailKitMailClient(fake);
 
-        Assert.ThrowsAsync<OperationCanceledException>(() => sut.SendAsync(CreateValidMessage()));
+        Assert.ThrowsAsync<OperationCanceledException>(() => sut.SendAsync(TestMessages.CreateValid()));
 
         Assert.That(fake.DisposeCount, Is.EqualTo(1));
     }
@@ -87,7 +65,7 @@ public class MailKitMailClientTests
         var fake = new FakeSmtpClient();
         var sut = new TestableMailKitMailClient(fake);
 
-        await sut.SendAsync(CreateValidMessage());
+        await sut.SendAsync(TestMessages.CreateValid());
 
         Assert.Multiple(() =>
         {
