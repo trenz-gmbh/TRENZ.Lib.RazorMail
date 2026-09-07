@@ -32,6 +32,16 @@ public class MailController(
         return Ok();
     }
 
+    [HttpPost]
+    public async Task<IActionResult> SendWithMSGraph([FromBody] SendSampleMailRequest request, [FromKeyedServices("MSGraph")] IMailClient client)
+    {
+        var message = await MakeMessage(request);
+
+        await client.SendAsync(message);
+
+        return Ok();
+    }
+
     private async Task<MailMessage> MakeMessage(SendSampleMailRequest request)
     {
         var model = new SampleModel(request.Salutation);

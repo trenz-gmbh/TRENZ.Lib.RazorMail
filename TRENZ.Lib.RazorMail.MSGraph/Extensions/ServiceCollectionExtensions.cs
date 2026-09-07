@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
         object? serviceKey = null
     )
     {
-        services.AddOptions<AzureAdOptions>().BindConfiguration(AzureAdOptions.SectionName);
+        services.AddOptions<MSGraphOptions>().BindConfiguration(MSGraphOptions.SectionName);
 
         if (serviceKey is null)
         {
@@ -44,7 +44,7 @@ public static class ServiceCollectionExtensions
     private static MSGraphMailClient CreateMSGraphService(IServiceProvider serviceProvider,
         Action<IServiceProvider, MSGraphMailClient>? configureClient)
     {
-        var azureAdOptions = serviceProvider.GetRequiredService<IOptions<AzureAdOptions>>();
+        var azureAdOptions = serviceProvider.GetRequiredService<IOptions<MSGraphOptions>>();
         var msGraphMailLogger = serviceProvider.GetRequiredService<ILogger<MSGraphMailClient>>();
 
         var msGraphMailClient = new MSGraphMailClient(azureAdOptions, msGraphMailLogger);

@@ -18,3 +18,14 @@ Content-Type: application/json
   "to": ["bar@example.com", "qux@example.com"],
   "salutation": "Dear Bar"
 }
+
+###
+# Via ms graph
+POST http://localhost:5102/mail/SendWithMSGraph
+Content-Type: application/json
+
+{
+  "from": "t.zimmer@trenz.de",
+  "to": ["t.zimmer@trenz.de"],
+  "salutation": "Dear Bar"
+}
