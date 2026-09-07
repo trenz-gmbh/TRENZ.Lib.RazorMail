@@ -7,6 +7,7 @@ using Microsoft.Graph.Models;
 
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Models;
+using TRENZ.Lib.RazorMail.MSGraph.Extensions;
 using TRENZ.Lib.RazorMail.MSGraph.Models;
 
 using SendMailPostRequestBody = Microsoft.Graph.Users.Item.SendMail.SendMailPostRequestBody;
@@ -20,7 +21,7 @@ public class MSGraphMailClient : IMailClient
     private MSGraphOptions _options;
     private ILogger<MSGraphMailClient> _logger;
 
-    public MSGraphMailClient(IOptions<MSGraphOptions> accountOptions, ILogger<MSGraphMailClient> logger)
+    internal MSGraphMailClient(IOptions<MSGraphOptions> accountOptions, ILogger<MSGraphMailClient> logger)
     {
         if (_graphServiceClient is null)
         {
@@ -70,41 +71,8 @@ public class MSGraphMailClient : IMailClient
             return;
         }
 
-        var requestBody = MailMessageToMSRequestBody(message);
+        var requestBody = message.ToMSMailPostRequestBody();
         await _graphServiceClient.Users[message.Headers.From.Email].SendMail.PostAsync(requestBody);
     }
 
-    private SendMailPostRequestBody MailMessageToMSRequestBody(MailMessage message)
-    {
-        var messageContent = message.Content;
-        var msGraphRecipients = new List<Recipient>();
-        foreach (var domainRecipients in message.Headers.Recipients)
-        {
-            var msGraphEmailAddress = new EmailAddress
-            {
-                Address = domainRecipients.Email
-            };
-            msGraphRecipients.Add(
-                new Recipient
-                {
-                    EmailAddress = msGraphEmailAddress
-                }
-            );
-        }
-
-        return new SendMailPostRequestBody
-        {
-            Message = new Message
-            {
-                Subject = messageContent.Subject,
-                Body = new ItemBody
-                {
-                    ContentType = BodyType.Html,
-                    Content = messageContent.HtmlBody
-                },
-                ToRecipients = msGraphRecipients
-            },
-            SaveToSentItems = false
-        };
-    }
 }
