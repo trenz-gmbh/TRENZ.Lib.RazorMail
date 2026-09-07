@@ -1,17 +1,25 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Graph;
 
+using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Models;
+using TRENZ.Lib.RazorMail.MSGraph.Models;
 using TRENZ.Lib.RazorMail.Services;
 
 namespace TRENZ.Lib.RazorMail.MSGraph;
 
-public class MSGraphMailClient(IOptions<SmtpAccount> accountOptions, ILogger<MSGraphMailClient> logger)
-    : BaseSmtpMailClient(accountOptions)
+public class MSGraphMailClient : IMailClient
 {
-    //todo client?
+    public MSGraphMailClient(IOptions<AzureAdOptions> accountOptions, ILogger<MSGraphMailClient> logger)
+    {
 
-    protected override Task SendInternalAsync(MailMessage message, CancellationToken cancellationToken)
+    }
+
+
+    public MailHeaderCollection DefaultHeaders { get; } = new();
+
+    public Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
