@@ -71,7 +71,7 @@ public class MSGraphMailClient : IMailClient
             return;
         }
 
-        var requestBody = message.ToMSMailPostRequestBody();
+        var requestBody = message.ToMSMailPostRequestBody(_options.SaveToSentItems);
         await _graphServiceClient.Users[message.Headers.From.Email].SendMail.PostAsync(requestBody);
     }
 
