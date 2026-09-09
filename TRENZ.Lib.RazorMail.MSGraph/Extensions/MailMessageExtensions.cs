@@ -7,33 +7,37 @@ namespace TRENZ.Lib.RazorMail.MSGraph.Extensions;
 
 public static class MailMessageExtensions
 {
-    public static SendMailPostRequestBody ToMSMailPostRequestBody(this MailMessage message,
-        bool saveToSentItems = false)
+    public static Message ToMSMessage(this MailMessage message)
     {
         var messageContent = message.Content;
         var messageHeader = message.Headers;
         var msGraphRecipients = ExtractRecipientsFromHeader(messageHeader);
+        return new Message
+        {
+            Subject = messageContent.Subject,
+            Body = new ItemBody
+            {
+                ContentType = BodyType.Html,
+                Content = messageContent.HtmlBody
+            },
+            ToRecipients = msGraphRecipients.ToRecipients,
+            CcRecipients = msGraphRecipients.CcRecipients,
+            BccRecipients = msGraphRecipients.BccRecipients,
+            ReplyTo = msGraphRecipients.ReplyRecipients,
+            Importance = messageHeader.Importance.ToMSImportance(),
+            From = new Recipient()
+            {
+                EmailAddress = messageHeader.From?.ToMSEmailAddress(),
+            },
+        };
+    }
 
+    public static SendMailPostRequestBody ToMSMailPostRequestBody(this Message message,
+        bool saveToSentItems = false)
+    {
         return new SendMailPostRequestBody
         {
-            Message = new Message
-            {
-                Subject = messageContent.Subject,
-                Body = new ItemBody
-                {
-                    ContentType = BodyType.Html,
-                    Content = messageContent.HtmlBody
-                },
-                ToRecipients = msGraphRecipients.ToRecipients,
-                CcRecipients = msGraphRecipients.CcRecipients,
-                BccRecipients = msGraphRecipients.BccRecipients,
-                ReplyTo = msGraphRecipients.ReplyRecipients,
-                Importance = messageHeader.Importance.ToMSImportance(),
-                From = new Recipient()
-                {
-                    EmailAddress = messageHeader.From?.ToMSEmailAddress(),
-                }
-            },
+            Message = message,
             SaveToSentItems = saveToSentItems
         };
     }

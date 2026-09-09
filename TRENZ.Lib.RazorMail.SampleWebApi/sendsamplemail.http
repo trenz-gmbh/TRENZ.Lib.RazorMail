@@ -27,5 +27,5 @@ Content-Type: application/json
 {
   "from": "t.zimmer@trenz.de",
   "to": ["t.zimmer@trenz.de"],
-  "salutation": "Dear Bar"
+  "salutation": "Dear Me this is a test one of many in fact o((⊙﹏⊙))o."
 }
