@@ -29,6 +29,8 @@ public static class MailMessageExtensions
             {
                 EmailAddress = messageHeader.From?.ToMSEmailAddress(),
             },
+            // talk to sören about this
+            AdditionalData = messageHeader.NonSpecificHandledHeaders as IDictionary<string, object> ?? new Dictionary<string, object>(),
         };
     }
 
