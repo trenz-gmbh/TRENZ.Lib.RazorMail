@@ -1,6 +1,5 @@
 ﻿using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.SendMail;
-
 using TRENZ.Lib.RazorMail.Models;
 
 namespace TRENZ.Lib.RazorMail.MSGraph.Extensions;
@@ -25,12 +24,13 @@ public static class MailMessageExtensions
             BccRecipients = msGraphRecipients.BccRecipients,
             ReplyTo = msGraphRecipients.ReplyRecipients,
             Importance = messageHeader.Importance.ToMSImportance(),
-            From = new Recipient()
+            From = new Recipient
             {
-                EmailAddress = messageHeader.From?.ToMSEmailAddress(),
+                EmailAddress = messageHeader.From?.ToMSEmailAddress()
             },
             // talk to sören about this
-            AdditionalData = messageHeader.NonSpecificHandledHeaders as IDictionary<string, object> ?? new Dictionary<string, object>(),
+            AdditionalData = messageHeader.NonSpecificHandledHeaders as IDictionary<string, object> ??
+                             new Dictionary<string, object>()
         };
     }
 
