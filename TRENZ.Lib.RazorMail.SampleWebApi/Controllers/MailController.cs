@@ -49,18 +49,6 @@ public class MailController(
         const string view = "Sample";
         var renderedMail = await emailRenderer.RenderAsync(view, model);
 
-        if (request.Attachment != null)
-        {
-            renderedMail.Attachments.Add(request.Attachment.FileName,
-                new MailAttachment()
-                {
-                    FileData = Convert.FromBase64String(request.Attachment.Base64String
-                    ),
-                    FileName =  request.Attachment.FileName,
-                    ContentType = request.Attachment.ContentType,
-                });
-        }
-
         var message = new MailMessage
         {
             Content = renderedMail,

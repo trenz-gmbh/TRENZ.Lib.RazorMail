@@ -4,7 +4,9 @@ Content-Type: application/json
 
 {
   "from": "foo@example.com",
-  "to": ["bar@example.com"],
+  "to": [
+    "bar@example.com"
+  ],
   "salutation": "Dear Bar"
 }
 
@@ -15,7 +17,10 @@ Content-Type: application/json
 
 {
   "from": "foo@example.com",
-  "to": ["bar@example.com", "qux@example.com"],
+  "to": [
+    "bar@example.com",
+    "qux@example.com"
+  ],
   "salutation": "Dear Bar"
 }
 
@@ -25,7 +30,28 @@ POST http://localhost:5102/mail/SendWithMSGraph
 Content-Type: application/json
 
 {
-  "from": "t.zimmer@trenz.de",
-  "to": ["t.zimmer@trenz.de"],
-  "salutation": "Dear Me this is a test one of many in fact o((⊙﹏⊙))o."
+  "from": "from@someone.com",
+  "to": [
+    "to@someone.com"
+  ],
+  "salutation": "Dear To this is a test"
+}
+
+
+###
+# Via ms graph with attachment
+POST http://localhost:5102/mail/SendWithMSGraph
+Content-Type: application/json
+
+{
+  "from": "from@someone.com",
+  "to": [
+    "to@someone.com"
+  ],
+  "salutation": "Dear To this is a test with an attachment",
+  "Attachment": {
+    "FileName": "your_attachment.jpg",
+    "Base64String": "your_base64_string",
+    "ContentType": "image/jpeg"
+  }
 }
