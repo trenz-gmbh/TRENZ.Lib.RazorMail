@@ -29,7 +29,6 @@ public static class MailMessageExtensions
             {
                 EmailAddress = messageHeader.From?.ToMsEmailAddress()
             },
-            // talk to sören about this
             AdditionalData = messageHeader.NonSpecificHandledHeaders as IDictionary<string, object> ??
                              new Dictionary<string, object>()
         };
@@ -48,46 +47,22 @@ public static class MailMessageExtensions
     private static MsRecipients ExtractRecipientsFromHeader(MailHeaderCollection headerCollection)
     {
         var msRecipients = new MsRecipients();
-        foreach (var domainRecipients in headerCollection.Recipients)
+        msRecipients.ToRecipients.AddRange(headerCollection.Recipients.Select(mailAddress => new Recipient()
         {
-            msRecipients.ToRecipients.Add(
-                new Recipient
-                {
-                    EmailAddress = domainRecipients.ToMsEmailAddress()
-                }
-            );
-        }
-
-        foreach (var domainRecipients in headerCollection.CarbonCopy)
+            EmailAddress = mailAddress.ToMsEmailAddress()
+        }));
+        msRecipients.CcRecipients.AddRange(headerCollection.CarbonCopy.Select(mailAddress => new Recipient()
         {
-            msRecipients.CcRecipients.Add(
-                new Recipient
-                {
-                    EmailAddress = domainRecipients.ToMsEmailAddress()
-                }
-            );
-        }
-
-        foreach (var domainRecipients in headerCollection.BlindCarbonCopy)
+            EmailAddress = mailAddress.ToMsEmailAddress()
+        }));
+        msRecipients.BccRecipients.AddRange(headerCollection.BlindCarbonCopy.Select(mailAddress => new Recipient()
         {
-            msRecipients.BccRecipients.Add(
-                new Recipient
-                {
-                    EmailAddress = domainRecipients.ToMsEmailAddress()
-                }
-            );
-        }
-
-        foreach (var domainRecipients in headerCollection.ReplyTo)
+            EmailAddress = mailAddress.ToMsEmailAddress()
+        }));
+        msRecipients.ReplyRecipients.AddRange(headerCollection.ReplyTo.Select(mailAddress => new Recipient
         {
-            msRecipients.ReplyRecipients.Add(
-                new Recipient
-                {
-                    EmailAddress = domainRecipients.ToMsEmailAddress()
-                }
-            );
-        }
-
+            EmailAddress = mailAddress.ToMsEmailAddress()
+        }));
         return msRecipients;
     }
 

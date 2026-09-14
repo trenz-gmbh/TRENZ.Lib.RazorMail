@@ -36,3 +36,9 @@ Content-Type: application/json
   ],
   "salutation": "Dear To this is a test"
 }
+
+
+###
+# Delegation start auth process
+POST http://localhost:5102/mail/StartMsAuthenticationProcess
+Content-Type: application/json

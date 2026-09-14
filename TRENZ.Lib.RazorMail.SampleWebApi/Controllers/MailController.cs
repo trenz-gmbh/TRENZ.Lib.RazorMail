@@ -52,13 +52,30 @@ public class MailController(
     {
         if (client is not MsGraphDelegatedMailClient mailClient)
         {
-            return BadRequest("RazorMail MSGraph is not in delegated mode");
+            return BadRequest("RazorMail MsGraph is not in delegated mode");
         }
 
         await mailClient.InitializeGraphClientViaAuthCode(authcode);
         return Ok();
     }
 
+    [HttpPost]
+    public Task<IActionResult> StartMsAuthenticationProcess([FromKeyedServices("MsGraph")] IMailClient client)
+    {
+        try
+        {
+            if (client is not MsGraphDelegatedMailClient mailClient)
+            {
+                return Task.FromResult<IActionResult>(BadRequest("RazorMail MsGraph is not in delegated mode"));
+            }
+            mailClient.CallMsLoginPage();
+            return Task.FromResult<IActionResult>(Ok());
+        }
+        catch (Exception exception)
+        {
+            return Task.FromException<IActionResult>(exception);
+        }
+    }
 
     private async Task<MailMessage> MakeMessage(SendSampleMailRequest request)
     {

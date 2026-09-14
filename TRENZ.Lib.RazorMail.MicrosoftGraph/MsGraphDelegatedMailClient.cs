@@ -10,6 +10,7 @@ using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession;
 using Microsoft.Graph.Users.Item.SendMail;
 
+using TRENZ.Lib.RazorMail.MSGraph.Exceptions;
 using TRENZ.Lib.RazorMail.MSGraph.Models;
 
 using Process = System.Diagnostics.Process;
@@ -23,7 +24,6 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     internal MsGraphDelegatedMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
         base(accountOptions, logger)
     {
-        CallMsLoginPage();
     }
 
     /// <summary>
@@ -76,7 +76,12 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         Logger.LogInformation("Delegated GrapService started for user: {name}", _user.DisplayName);
     }
 
-    private void CallMsLoginPage()
+    /// <summary>
+    /// Method which calls the microsoft login flow.
+    /// This will be attempted to be opened in a browser.
+    /// See https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow for more details.
+    /// </summary>
+    public void CallMsLoginPage()
     {
         var scopes = new[] { "User.Read", "Mail.ReadWrite", "Mail.Send" };
         var stringBuilder = new StringBuilder("https://login.microsoftonline.com/");
@@ -97,11 +102,11 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     }
 
 
-    protected override async Task<UploadSession> GetUploadSessionForMessage(string fromMail, string postedMessageId,
+    protected override async Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
         CreateUploadSessionPostRequestBody requestBody,
         CancellationToken cancellationToken)
     {
-        return (UploadSession)await DoMailTaskWithChecks<object>(fromMail, async () =>
+        return (UploadSession?)await DoMailTaskWithChecks<object?>(fromMail, async () =>
         {
             Microsoft.Graph.Me.Messages.Item.Attachments.CreateUploadSession.CreateUploadSessionPostRequestBody
                 request =
@@ -109,7 +114,7 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
                     {
                         AttachmentItem = requestBody.AttachmentItem
                     };
-            return await GraphServiceClient.Me.Messages[postedMessageId].Attachments
+            return await GraphServiceClient!.Me.Messages[postedMessageId].Attachments
                 .CreateUploadSession.PostAsync(request, cancellationToken: cancellationToken);
         });
     }
@@ -117,14 +122,14 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     protected override async Task<Message?> PostMessageToInbox(string fromMail, Message message,
         CancellationToken cancellationToken)
     {
-        return (Message?)await DoMailTaskWithChecks<object?>(fromMail, async () => await GraphServiceClient.Me.Messages
+        return (Message?)await DoMailTaskWithChecks<object?>(fromMail, async () => await GraphServiceClient!.Me.Messages
             .PostAsync(message, cancellationToken: cancellationToken));
     }
 
     protected override async Task SendPostedMessage(string fromMail, string messageId,
         CancellationToken cancellationToken)
     {
-        await DoMailTaskWithChecks(fromMail, async () => await GraphServiceClient.Me.Messages[messageId].Send
+        await DoMailTaskWithChecks(fromMail, async () => await GraphServiceClient!.Me.Messages[messageId].Send
             .PostAsync(cancellationToken: cancellationToken));
     }
 
@@ -132,27 +137,19 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         FileAttachment fileAttachment,
         CancellationToken cancellationToken)
     {
-        await DoMailTaskWithChecks(fromMail, async () => await GraphServiceClient.Me.Messages[messageId].Attachments
+        await DoMailTaskWithChecks(fromMail, async () => await GraphServiceClient!.Me.Messages[messageId].Attachments
             .PostAsync(fileAttachment, cancellationToken: cancellationToken));
     }
 
     private async Task<object?> DoMailTaskWithChecks<T>(string fromMail, Func<Task<T>> func)
     {
-        if (!EnsureFromMailIsUserMail(fromMail))
-        {
-            return null;
-        }
-
+        EnsureFromMailIsUserMail(fromMail);
         return await func.Invoke();
     }
 
     private async Task DoMailTaskWithChecks(string fromMail, Func<Task> func)
     {
-        if (!EnsureFromMailIsUserMail(fromMail))
-        {
-            return;
-        }
-
+        EnsureFromMailIsUserMail(fromMail);
         await func.Invoke();
     }
 
@@ -166,20 +163,21 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
             {
                 Message = sendMailPostRequestBody.Message
             };
-            await GraphServiceClient.Me.SendMail
+            await GraphServiceClient!.Me.SendMail
                 .PostAsync(requestBody, cancellationToken: cancellationToken);
         });
     }
 
 
-    private bool EnsureFromMailIsUserMail(string fromMail)
+    private void EnsureFromMailIsUserMail(string fromMail)
     {
-        if (fromMail.Equals(_user.Mail))
+        if (fromMail.Equals(_user!.Mail))
         {
-            return true;
+            return;
         }
 
-        Logger.LogWarning("Attempted to send mail from an address that is not the authenticated users");
-        return false;
+        const string errorMessage = "Attempted to send mail from an address that is not the authenticated users";
+        Logger.LogWarning(errorMessage);
+        throw new RazorMailMsGraphException(errorMessage);
     }
 }

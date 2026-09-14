@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics.CodeAnalysis;
+
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -31,7 +33,9 @@ public abstract class MsGraphMailClient : IMailClient
 
     public MailHeaderCollection DefaultHeaders { get; } = new();
 
+
     /// <inheritdoc />
+    [MemberNotNull(nameof(GraphServiceClient))]
     public async Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
         await SendInternalAsync(message, cancellationToken);
@@ -74,7 +78,7 @@ public abstract class MsGraphMailClient : IMailClient
             stringToAttachmentValuePair => stringToAttachmentValuePair.Value.ToFileAttachment());
 
         var postedMessage = await PostMessageToInbox(fromMail, msMessage, cancellationToken);
-        if (postedMessage == null)
+        if (postedMessage?.Id is null )
         {
             Logger.LogError(
                 "Failed to post message in preparation for attachment upload. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject: {Subject}",
@@ -91,7 +95,7 @@ public abstract class MsGraphMailClient : IMailClient
              * else we need to create an upload session.
              * It is not clear what exactly 3 MB constitutes for MS therefore we go with SI unit.
              */
-            var contentBytesLength = msFileAttachment.Value.ContentBytes.Length;
+            var contentBytesLength = msFileAttachment.Value.ContentBytes!.Length;
             if (contentBytesLength < 3e6)
             {
                 await AddSmallAttachmentToExistingMessage(fromMail, postedMessage.Id, msFileAttachment.Value,
@@ -138,7 +142,7 @@ public abstract class MsGraphMailClient : IMailClient
         await largeFileUploadTask.UploadAsync(cancellationToken: cancellationToken);
     }
 
-    protected abstract Task<UploadSession> GetUploadSessionForMessage(string fromMail, string postedMessageId,
+    protected abstract Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
         CreateUploadSessionPostRequestBody requestBody,
         CancellationToken cancellationToken);
 

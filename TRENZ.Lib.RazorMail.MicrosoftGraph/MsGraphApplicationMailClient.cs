@@ -35,25 +35,25 @@ public class MsGraphApplicationMailClient : MsGraphMailClient
         GraphServiceClient = new GraphServiceClient(clientSecretCredential);
     }
 
-    protected override async Task<UploadSession> GetUploadSessionForMessage(string fromMail, string postedMessageId,
+    protected override async Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
         CreateUploadSessionPostRequestBody requestBody,
         CancellationToken cancellationToken)
     {
-        return await GraphServiceClient.Users[fromMail].Messages[postedMessageId].Attachments
+        return await GraphServiceClient!.Users[fromMail].Messages[postedMessageId].Attachments
             .CreateUploadSession.PostAsync(requestBody, cancellationToken: cancellationToken);
     }
 
     protected override async Task<Message?> PostMessageToInbox(string fromMail, Message message,
         CancellationToken cancellationToken)
     {
-        return await GraphServiceClient.Users[fromMail].Messages
+        return await GraphServiceClient!.Users[fromMail].Messages
             .PostAsync(message, cancellationToken: cancellationToken);
     }
 
     protected override async Task SendPostedMessage(string fromMail, string messageId,
         CancellationToken cancellationToken)
     {
-        await GraphServiceClient.Users[fromMail].Messages[messageId].Send
+        await GraphServiceClient!.Users[fromMail].Messages[messageId].Send
             .PostAsync(cancellationToken: cancellationToken);
     }
 
@@ -61,7 +61,7 @@ public class MsGraphApplicationMailClient : MsGraphMailClient
         FileAttachment fileAttachment,
         CancellationToken cancellationToken)
     {
-        await GraphServiceClient.Users[fromMail].Messages[messageId].Attachments
+        await GraphServiceClient!.Users[fromMail].Messages[messageId].Attachments
             .PostAsync(fileAttachment, cancellationToken: cancellationToken);
     }
 
@@ -69,7 +69,7 @@ public class MsGraphApplicationMailClient : MsGraphMailClient
         SendMailPostRequestBody sendMailPostRequestBody,
         CancellationToken cancellationToken)
     {
-        await GraphServiceClient.Users[fromMail].SendMail
+        await GraphServiceClient!.Users[fromMail].SendMail
             .PostAsync(sendMailPostRequestBody, cancellationToken: cancellationToken);
     }
 }
