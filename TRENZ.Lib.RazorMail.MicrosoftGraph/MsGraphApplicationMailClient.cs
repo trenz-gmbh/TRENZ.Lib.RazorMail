@@ -13,14 +13,14 @@ namespace TRENZ.Lib.RazorMail.MSGraph;
 
 public class MsGraphApplicationMailClient : MsGraphMailClient
 {
-    public MsGraphApplicationMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
+    internal MsGraphApplicationMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
         base(accountOptions, logger)
     {
-        InitalizeGraphClient();
+        InitializeGraphClient();
     }
 
 
-    private void InitalizeGraphClient()
+    private void InitializeGraphClient()
     {
         var tenantId = Options.TenantId;
         var clientId = Options.ClientId;

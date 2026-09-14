@@ -2,7 +2,7 @@
 
 public record MsGraphOptions
 {
-    public const string SectionName = "MSGraphOptions";
+    public const string SectionName = "MsGraphOptions";
 
     public required string TenantId { get; init; }
 
@@ -13,7 +13,5 @@ public record MsGraphOptions
     public required bool SaveToSentItems { get; init; }
 
     public string? RedirectUri { get; init; }
-    public string[]? Scopes { get; init; }
-
     public required bool Delegated { get; init; }
 }

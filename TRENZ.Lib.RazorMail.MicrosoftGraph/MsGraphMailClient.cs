@@ -31,6 +31,7 @@ public abstract class MsGraphMailClient : IMailClient
 
     public MailHeaderCollection DefaultHeaders { get; } = new();
 
+    /// <inheritdoc />
     public async Task SendAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
         await SendInternalAsync(message, cancellationToken);

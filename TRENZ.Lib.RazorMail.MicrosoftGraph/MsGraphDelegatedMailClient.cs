@@ -18,14 +18,23 @@ namespace TRENZ.Lib.RazorMail.MSGraph;
 
 public class MsGraphDelegatedMailClient : MsGraphMailClient
 {
-    private User? _user = null;
+    private User? _user;
 
-    public MsGraphDelegatedMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
+    internal MsGraphDelegatedMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
         base(accountOptions, logger)
     {
         CallMsLoginPage();
     }
 
+    /// <summary>
+    /// Method to initialize the graph client used to interact with the Ms Graph API.
+    /// This Method is intended to be called by the redirect point of your application specified in the
+    /// appsettings as well as in entra id.
+    /// The authcode should then be provided as a query parameter.
+    /// For more information about this process see here: https://learn.microsoft.com/en-us/graph/auth-v2-user?tabs=http
+    ///
+    /// </summary>
+    /// <param name="authCode">The authorization code provided by the microsoft id platform</param>
     public async Task InitializeGraphClientViaAuthCode(string authCode)
     {
         if (GraphServiceClient is not null)
@@ -70,11 +79,6 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     private void CallMsLoginPage()
     {
         var scopes = new[] { "User.Read", "Mail.ReadWrite", "Mail.Send" };
-        if (Options.Scopes is not null)
-        {
-            scopes = Options.Scopes;
-        }
-
         var stringBuilder = new StringBuilder("https://login.microsoftonline.com/");
         stringBuilder.Append(Options.TenantId).Append("/oauth2/v2.0/authorize?client_id=");
         stringBuilder.Append(Options.ClientId).Append("&response_type=code");
@@ -113,7 +117,6 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     protected override async Task<Message?> PostMessageToInbox(string fromMail, Message message,
         CancellationToken cancellationToken)
     {
-
         return (Message?)await DoMailTaskWithChecks<object?>(fromMail, async () => await GraphServiceClient.Me.Messages
             .PostAsync(message, cancellationToken: cancellationToken));
     }
