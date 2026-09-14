@@ -37,7 +37,7 @@ public class MailController(
 
     [HttpPost]
     public async Task<IActionResult> SendWithMsGraph([FromBody] SendSampleMailRequest request,
-        [FromKeyedServices("MSGraph")] IMailClient client)
+        [FromKeyedServices("MsGraph")] IMailClient client)
     {
         var message = await MakeMessage(request);
 
@@ -48,7 +48,7 @@ public class MailController(
 
     [HttpGet]
     public async Task<IActionResult> AuthcodeReceiver([FromQuery(Name = "code")] string authcode,
-        [FromKeyedServices("MSGraph")] IMailClient client)
+        [FromKeyedServices("MsGraph")] IMailClient client)
     {
         if (client is not MsGraphDelegatedMailClient mailClient)
         {

@@ -113,6 +113,7 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     protected override async Task<Message?> PostMessageToInbox(string fromMail, Message message,
         CancellationToken cancellationToken)
     {
+
         return (Message?)await DoMailTaskWithChecks<object?>(fromMail, async () => await GraphServiceClient.Me.Messages
             .PostAsync(message, cancellationToken: cancellationToken));
     }

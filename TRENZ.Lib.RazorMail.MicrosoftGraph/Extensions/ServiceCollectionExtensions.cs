@@ -46,13 +46,13 @@ public static class ServiceCollectionExtensions
         var azureAdOptions = serviceProvider.GetRequiredService<IOptions<MsGraphOptions>>();
         var msGraphMailLogger = serviceProvider.GetRequiredService<ILogger<MsGraphMailClient>>();
         MsGraphMailClient msGraphMailClient;
-        if (azureAdOptions.Value.RedirectUri is null)
+        if (azureAdOptions.Value.Delegated)
         {
-            msGraphMailClient = new MsGraphApplicationMailClient(azureAdOptions, msGraphMailLogger);
+            msGraphMailClient = new MsGraphDelegatedMailClient(azureAdOptions, msGraphMailLogger);
         }
         else
         {
-            msGraphMailClient = new MsGraphDelegatedMailClient(azureAdOptions, msGraphMailLogger);
+            msGraphMailClient = new MsGraphApplicationMailClient(azureAdOptions, msGraphMailLogger);
         }
 
         configureClient?.Invoke(serviceProvider, msGraphMailClient);

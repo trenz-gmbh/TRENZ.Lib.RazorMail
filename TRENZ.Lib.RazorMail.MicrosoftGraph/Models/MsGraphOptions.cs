@@ -14,4 +14,6 @@ public record MsGraphOptions
 
     public string? RedirectUri { get; init; }
     public string[]? Scopes { get; init; }
+
+    public required bool Delegated { get; init; }
 }
