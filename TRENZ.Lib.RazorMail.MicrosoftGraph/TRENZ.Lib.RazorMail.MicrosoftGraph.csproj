@@ -3,6 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <RootNamespace>TRENZ.Lib.RazorMail.MSGraph</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

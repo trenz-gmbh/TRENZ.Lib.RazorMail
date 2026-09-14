@@ -30,7 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.MSGraph", "TRENZ.Lib.RazorMail.MSGraph\TRENZ.Lib.RazorMail.MSGraph.csproj", "{461CC0E6-5724-4DED-9742-6F14A74B252E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRENZ.Lib.RazorMail.MicrosoftGraph", "TRENZ.Lib.RazorMail.MicrosoftGraph\TRENZ.Lib.RazorMail.MicrosoftGraph.csproj", "{461CC0E6-5724-4DED-9742-6F14A74B252E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
