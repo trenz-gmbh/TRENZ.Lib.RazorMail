@@ -65,7 +65,7 @@ public abstract class MsGraphMailClient : IMailClient
             if (message.Content.Attachments.Any(keyValuePair =>
                     keyValuePair.Value.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession))
             {
-                await HandleMessageWithAttachments(msMessage, message, fromMail, cancellationToken);
+                await HandleMessageWithLargerAttachments(msMessage, message, fromMail, cancellationToken);
                 return;
             }
 
@@ -91,7 +91,7 @@ public abstract class MsGraphMailClient : IMailClient
         await SendMailDirectly(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems), cancellationToken);
     }
 
-    private async Task HandleMessageWithAttachments(Message msMessage, MailMessage message, string fromMail,
+    private async Task HandleMessageWithLargerAttachments(Message msMessage, MailMessage message, string fromMail,
         CancellationToken cancellationToken)
     {
         var msFileAttachments = message.Content.Attachments.ToDictionary(
