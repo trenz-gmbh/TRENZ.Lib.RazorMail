@@ -1,4 +1,5 @@
 ﻿using Microsoft.Graph.Models;
+
 using TRENZ.Lib.RazorMail.Models;
 
 namespace TRENZ.Lib.RazorMail.MSGraph.Extensions;

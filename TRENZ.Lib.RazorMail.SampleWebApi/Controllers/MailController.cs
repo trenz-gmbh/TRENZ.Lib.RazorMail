@@ -36,7 +36,7 @@ public class MailController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> SendWithMSGraph([FromBody] SendSampleMailRequest request,
+    public async Task<IActionResult> SendWithMsGraph([FromBody] SendSampleMailRequest request,
         [FromKeyedServices("MSGraph")] IMailClient client)
     {
         var message = await MakeMessage(request);
@@ -47,15 +47,16 @@ public class MailController(
     }
 
     [HttpGet]
-    public async Task<IActionResult> AuthcodeReceiver([FromQuery(Name = "code")] string authcode,  [FromKeyedServices("MSGraph")] IMailClient client)
+    public async Task<IActionResult> AuthcodeReceiver([FromQuery(Name = "code")] string authcode,
+        [FromKeyedServices("MSGraph")] IMailClient client)
     {
-        if (client is MsGraphDelegatedMailClient)
+        if (client is not MsGraphDelegatedMailClient mailClient)
         {
-            await ((MsGraphDelegatedMailClient) client).InitializeGraphClientViaAuthCode(authcode);
-            return Ok();
+            return BadRequest("RazorMail MSGraph is not in delegated mode");
         }
-        //fixme return smth better
-        return BadRequest();
+
+        await mailClient.InitializeGraphClientViaAuthCode(authcode);
+        return Ok();
     }
 
 

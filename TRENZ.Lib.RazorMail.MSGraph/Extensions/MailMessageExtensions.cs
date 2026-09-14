@@ -1,12 +1,13 @@
 ﻿using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.SendMail;
+
 using TRENZ.Lib.RazorMail.Models;
 
 namespace TRENZ.Lib.RazorMail.MSGraph.Extensions;
 
 public static class MailMessageExtensions
 {
-    public static Message ToMSMessage(this MailMessage message)
+    public static Message ToMsMessage(this MailMessage message)
     {
         var messageContent = message.Content;
         var messageHeader = message.Headers;
@@ -23,10 +24,10 @@ public static class MailMessageExtensions
             CcRecipients = msGraphRecipients.CcRecipients,
             BccRecipients = msGraphRecipients.BccRecipients,
             ReplyTo = msGraphRecipients.ReplyRecipients,
-            Importance = messageHeader.Importance.ToMSImportance(),
+            Importance = messageHeader.Importance.ToMsImportance(),
             From = new Recipient
             {
-                EmailAddress = messageHeader.From?.ToMSEmailAddress()
+                EmailAddress = messageHeader.From?.ToMsEmailAddress()
             },
             // talk to sören about this
             AdditionalData = messageHeader.NonSpecificHandledHeaders as IDictionary<string, object> ??
@@ -34,7 +35,7 @@ public static class MailMessageExtensions
         };
     }
 
-    public static SendMailPostRequestBody ToMSMailPostRequestBody(this Message message,
+    public static SendMailPostRequestBody ToMsMailPostRequestBody(this Message message,
         bool saveToSentItems = false)
     {
         return new SendMailPostRequestBody
@@ -52,7 +53,7 @@ public static class MailMessageExtensions
             msRecipients.ToRecipients.Add(
                 new Recipient
                 {
-                    EmailAddress = domainRecipients.ToMSEmailAddress()
+                    EmailAddress = domainRecipients.ToMsEmailAddress()
                 }
             );
         }
@@ -62,7 +63,7 @@ public static class MailMessageExtensions
             msRecipients.CcRecipients.Add(
                 new Recipient
                 {
-                    EmailAddress = domainRecipients.ToMSEmailAddress()
+                    EmailAddress = domainRecipients.ToMsEmailAddress()
                 }
             );
         }
@@ -72,7 +73,7 @@ public static class MailMessageExtensions
             msRecipients.BccRecipients.Add(
                 new Recipient
                 {
-                    EmailAddress = domainRecipients.ToMSEmailAddress()
+                    EmailAddress = domainRecipients.ToMsEmailAddress()
                 }
             );
         }
@@ -82,7 +83,7 @@ public static class MailMessageExtensions
             msRecipients.ReplyRecipients.Add(
                 new Recipient
                 {
-                    EmailAddress = domainRecipients.ToMSEmailAddress()
+                    EmailAddress = domainRecipients.ToMsEmailAddress()
                 }
             );
         }

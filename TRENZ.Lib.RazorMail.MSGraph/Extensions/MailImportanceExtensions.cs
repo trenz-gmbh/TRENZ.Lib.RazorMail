@@ -1,11 +1,12 @@
 ﻿using Microsoft.Graph.Models;
+
 using TRENZ.Lib.RazorMail.Models;
 
 namespace TRENZ.Lib.RazorMail.MSGraph.Extensions;
 
 public static class MailImportanceExtensions
 {
-    public static Importance ToMSImportance(this MailImportance importance)
+    public static Importance ToMsImportance(this MailImportance importance)
     {
         switch (importance)
         {

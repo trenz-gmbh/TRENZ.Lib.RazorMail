@@ -13,10 +13,10 @@ builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
 builder.Services.AddRazorMailRenderer();
 builder.Services.AddMailKitMailClient("MailKit", ConfigureClient);
 builder.Services.AddSystemNetMailClient("System.Net.Mail", ConfigureClient);
-builder.Services.AddMSGraphMailClient("MSGraph", ConfigureClient);
+builder.Services.AddMsGraphMailClient("MsGraph", ConfigureClient);
 
 var app = builder.Build();
-var service = app.Services.GetRequiredKeyedService<IMailClient>("MSGraph");
+var service = app.Services.GetRequiredKeyedService<IMailClient>("MsGraph");
 
 app.MapControllers();
 

@@ -11,9 +11,9 @@ using TRENZ.Lib.RazorMail.MSGraph.Models;
 
 namespace TRENZ.Lib.RazorMail.MSGraph;
 
-public class MsGraphApplicationMailClient : MSGraphMailClient
+public class MsGraphApplicationMailClient : MsGraphMailClient
 {
-    public MsGraphApplicationMailClient(IOptions<MSGraphOptions> accountOptions, ILogger<MSGraphMailClient> logger) :
+    public MsGraphApplicationMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
         base(accountOptions, logger)
     {
         InitalizeGraphClient();

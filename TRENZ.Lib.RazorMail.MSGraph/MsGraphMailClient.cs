@@ -1,9 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text;
-
-using Azure.Identity;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -17,18 +12,19 @@ using TRENZ.Lib.RazorMail.MSGraph.Models;
 
 namespace TRENZ.Lib.RazorMail.MSGraph;
 
-public abstract class MSGraphMailClient : IMailClient
+public abstract class MsGraphMailClient : IMailClient
 {
-    protected readonly ILogger<MSGraphMailClient> Logger;
-    protected readonly MSGraphOptions Options;
+    protected readonly ILogger<MsGraphMailClient> Logger;
+    protected readonly MsGraphOptions Options;
     protected GraphServiceClient? GraphServiceClient = null;
 
-    internal MSGraphMailClient(IOptions<MSGraphOptions> accountOptions, ILogger<MSGraphMailClient> logger)
+    internal MsGraphMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger)
     {
         if (GraphServiceClient is not null)
         {
             return;
         }
+
         Options = accountOptions.Value;
         Logger = logger;
     }
@@ -41,12 +37,11 @@ public abstract class MSGraphMailClient : IMailClient
     }
 
 
-
     private async Task SendInternalAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
         if (GraphServiceClient is null)
         {
-            //fixme
+            Logger.LogWarning("A mail was attempted to be send but there is no GraphServiceClient initialized");
             return;
         }
 
@@ -57,13 +52,15 @@ public abstract class MSGraphMailClient : IMailClient
         }
 
         var fromMail = message.Headers.From.Email;
-        var msMessage = message.ToMSMessage();
+        var msMessage = message.ToMsMessage();
         if (message.Content.Attachments.Count > 0)
         {
             await HandleMessageWithAttachments(msMessage, message, fromMail, cancellationToken);
             return;
         }
-        await SendMailWithoutAttachments(fromMail, msMessage.ToMSMailPostRequestBody(Options.SaveToSentItems), cancellationToken);
+
+        await SendMailWithoutAttachments(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems),
+            cancellationToken);
         Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
             fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
     }
@@ -79,7 +76,7 @@ public abstract class MSGraphMailClient : IMailClient
         if (postedMessage == null)
         {
             Logger.LogError(
-                "Failed to post message in preparation for attachment upload. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
+                "Failed to post message in preparation for attachment upload. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject: {Subject}",
                 fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
             return;
         }
@@ -96,7 +93,8 @@ public abstract class MSGraphMailClient : IMailClient
             var contentBytesLength = msFileAttachment.Value.ContentBytes.Length;
             if (contentBytesLength < 3e6)
             {
-                await AddSmallAttachmentToExistingMessage(fromMail, postedMessage.Id, msFileAttachment.Value, cancellationToken);
+                await AddSmallAttachmentToExistingMessage(fromMail, postedMessage.Id, msFileAttachment.Value,
+                    cancellationToken);
                 continue;
             }
 
@@ -112,6 +110,7 @@ public abstract class MSGraphMailClient : IMailClient
             await UploadLargerAttachmentViaSession(fromMail, postedMessage.Id, msFileAttachment.Value,
                 cancellationToken);
         }
+
         await SendPostedMessage(fromMail, postedMessage.Id, cancellationToken);
         Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
             fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
@@ -130,7 +129,8 @@ public abstract class MSGraphMailClient : IMailClient
                 Size = fileSize
             }
         };
-        var uploadSession = await GetUploadSessionForMessage(fromMail, postedMessageId, attachmentUploadRequestBody, cancellationToken);
+        var uploadSession = await GetUploadSessionForMessage(fromMail, postedMessageId, attachmentUploadRequestBody,
+            cancellationToken);
         using var stream = new MemoryStream(fileAttachment.ContentBytes);
         var largeFileUploadTask =
             new LargeFileUploadTask<FileAttachment>(uploadSession, stream);
@@ -150,5 +150,6 @@ public abstract class MSGraphMailClient : IMailClient
         FileAttachment fileAttachment,
         CancellationToken cancellationToken);
 
-    protected abstract Task SendMailWithoutAttachments(string fromMail, SendMailPostRequestBody sendMailPostRequestBody, CancellationToken cancellationToken);
+    protected abstract Task SendMailWithoutAttachments(string fromMail, SendMailPostRequestBody sendMailPostRequestBody,
+        CancellationToken cancellationToken);
 }

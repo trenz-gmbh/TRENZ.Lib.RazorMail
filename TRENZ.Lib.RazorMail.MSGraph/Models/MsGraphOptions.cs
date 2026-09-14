@@ -1,6 +1,6 @@
 ﻿namespace TRENZ.Lib.RazorMail.MSGraph.Models;
 
-public record MSGraphOptions
+public record MsGraphOptions
 {
     public const string SectionName = "MSGraphOptions";
 
@@ -10,7 +10,10 @@ public record MSGraphOptions
 
     //fixme uhhhhhh
     public required string ClientSecret { get; init; }
+
     public required bool SaveToSentItems { get; init; }
+
     //fixme enum ?
-    public required string? RedirectUri { get; init; }
+    public string? RedirectUri { get; init; }
+    public string[]? Scopes { get; init; }
 }
