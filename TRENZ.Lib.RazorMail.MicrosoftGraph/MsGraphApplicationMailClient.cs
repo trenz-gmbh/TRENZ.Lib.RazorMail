@@ -7,9 +7,9 @@ using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession;
 using Microsoft.Graph.Users.Item.SendMail;
 
-using TRENZ.Lib.RazorMail.MSGraph.Models;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Models;
 
-namespace TRENZ.Lib.RazorMail.MSGraph;
+namespace TRENZ.Lib.RazorMail.MicrosoftGraph;
 
 public class MsGraphApplicationMailClient : MsGraphMailClient
 {

@@ -1,8 +1,8 @@
 using TRENZ.Lib.RazorMail.Extensions;
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.MailKit.Extensions;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
 using TRENZ.Lib.RazorMail.Models;
-using TRENZ.Lib.RazorMail.MSGraph.Extensions;
 using TRENZ.Lib.RazorMail.SystemNet.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);

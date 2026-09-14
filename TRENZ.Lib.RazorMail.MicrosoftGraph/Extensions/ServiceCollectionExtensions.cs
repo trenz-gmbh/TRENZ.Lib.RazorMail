@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using TRENZ.Lib.RazorMail.Interfaces;
-using TRENZ.Lib.RazorMail.MSGraph.Models;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Models;
 
-namespace TRENZ.Lib.RazorMail.MSGraph.Extensions;
+namespace TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
 
 public static class ServiceCollectionExtensions
 {

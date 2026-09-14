@@ -8,11 +8,11 @@ using Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession;
 using Microsoft.Graph.Users.Item.SendMail;
 
 using TRENZ.Lib.RazorMail.Interfaces;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Models;
 using TRENZ.Lib.RazorMail.Models;
-using TRENZ.Lib.RazorMail.MSGraph.Extensions;
-using TRENZ.Lib.RazorMail.MSGraph.Models;
 
-namespace TRENZ.Lib.RazorMail.MSGraph;
+namespace TRENZ.Lib.RazorMail.MicrosoftGraph;
 
 public abstract class MsGraphMailClient : IMailClient
 {

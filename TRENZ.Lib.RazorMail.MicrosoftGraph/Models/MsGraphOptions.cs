@@ -1,4 +1,4 @@
-﻿namespace TRENZ.Lib.RazorMail.MSGraph.Models;
+﻿namespace TRENZ.Lib.RazorMail.MicrosoftGraph.Models;
 
 public record MsGraphOptions
 {

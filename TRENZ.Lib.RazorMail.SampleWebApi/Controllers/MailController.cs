@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 
 using TRENZ.Lib.RazorMail.Interfaces;
+using TRENZ.Lib.RazorMail.MicrosoftGraph;
 using TRENZ.Lib.RazorMail.Models;
-using TRENZ.Lib.RazorMail.MSGraph;
 using TRENZ.Lib.RazorMail.SampleWebApi.Models;
 
 namespace TRENZ.Lib.RazorMail.SampleWebApi.Controllers;

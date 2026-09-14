@@ -3,7 +3,7 @@ using Microsoft.Graph.Users.Item.SendMail;
 
 using TRENZ.Lib.RazorMail.Models;
 
-namespace TRENZ.Lib.RazorMail.MSGraph.Extensions;
+namespace TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
 
 public static class MailMessageExtensions
 {
@@ -47,15 +47,15 @@ public static class MailMessageExtensions
     private static MsRecipients ExtractRecipientsFromHeader(MailHeaderCollection headerCollection)
     {
         var msRecipients = new MsRecipients();
-        msRecipients.ToRecipients.AddRange(headerCollection.Recipients.Select(mailAddress => new Recipient()
+        msRecipients.ToRecipients.AddRange(headerCollection.Recipients.Select(mailAddress => new Recipient
         {
             EmailAddress = mailAddress.ToMsEmailAddress()
         }));
-        msRecipients.CcRecipients.AddRange(headerCollection.CarbonCopy.Select(mailAddress => new Recipient()
+        msRecipients.CcRecipients.AddRange(headerCollection.CarbonCopy.Select(mailAddress => new Recipient
         {
             EmailAddress = mailAddress.ToMsEmailAddress()
         }));
-        msRecipients.BccRecipients.AddRange(headerCollection.BlindCarbonCopy.Select(mailAddress => new Recipient()
+        msRecipients.BccRecipients.AddRange(headerCollection.BlindCarbonCopy.Select(mailAddress => new Recipient
         {
             EmailAddress = mailAddress.ToMsEmailAddress()
         }));

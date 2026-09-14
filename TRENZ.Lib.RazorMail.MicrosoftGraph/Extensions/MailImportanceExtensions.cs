@@ -2,7 +2,7 @@
 
 using TRENZ.Lib.RazorMail.Models;
 
-namespace TRENZ.Lib.RazorMail.MSGraph.Extensions;
+namespace TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
 
 public static class MailImportanceExtensions
 {

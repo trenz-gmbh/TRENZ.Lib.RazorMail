@@ -10,12 +10,12 @@ using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession;
 using Microsoft.Graph.Users.Item.SendMail;
 
-using TRENZ.Lib.RazorMail.MSGraph.Exceptions;
-using TRENZ.Lib.RazorMail.MSGraph.Models;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Exceptions;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Models;
 
 using Process = System.Diagnostics.Process;
 
-namespace TRENZ.Lib.RazorMail.MSGraph;
+namespace TRENZ.Lib.RazorMail.MicrosoftGraph;
 
 public class MsGraphDelegatedMailClient : MsGraphMailClient
 {
@@ -27,12 +27,11 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     }
 
     /// <summary>
-    /// Method to initialize the graph client used to interact with the Ms Graph API.
-    /// This Method is intended to be called by the redirect point of your application specified in the
-    /// appsettings as well as in entra id.
-    /// The authcode should then be provided as a query parameter.
-    /// For more information about this process see here: https://learn.microsoft.com/en-us/graph/auth-v2-user?tabs=http
-    ///
+    ///     Method to initialize the graph client used to interact with the Ms Graph API.
+    ///     This Method is intended to be called by the redirect point of your application specified in the
+    ///     appsettings as well as in entra id.
+    ///     The authcode should then be provided as a query parameter.
+    ///     For more information about this process see here: https://learn.microsoft.com/en-us/graph/auth-v2-user?tabs=http
     /// </summary>
     /// <param name="authCode">The authorization code provided by the microsoft id platform</param>
     public async Task InitializeGraphClientViaAuthCode(string authCode)
@@ -77,9 +76,9 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     }
 
     /// <summary>
-    /// Method which calls the microsoft login flow.
-    /// This will be attempted to be opened in a browser.
-    /// See https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow for more details.
+    ///     Method which calls the microsoft login flow.
+    ///     This will be attempted to be opened in a browser.
+    ///     See https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow for more details.
     /// </summary>
     public void CallMsLoginPage()
     {
