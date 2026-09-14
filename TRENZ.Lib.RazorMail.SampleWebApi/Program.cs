@@ -2,6 +2,7 @@ using TRENZ.Lib.RazorMail.Extensions;
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.MailKit.Extensions;
 using TRENZ.Lib.RazorMail.Models;
+using TRENZ.Lib.RazorMail.MSGraph;
 using TRENZ.Lib.RazorMail.MSGraph.Extensions;
 using TRENZ.Lib.RazorMail.SystemNet.Extensions;
 
@@ -15,6 +16,7 @@ builder.Services.AddSystemNetMailClient("System.Net.Mail", ConfigureClient);
 builder.Services.AddMSGraphMailClient("MSGraph", ConfigureClient);
 
 var app = builder.Build();
+var service = app.Services.GetRequiredKeyedService<IMailClient>("MSGraph");
 
 app.MapControllers();
 

@@ -1,9 +1,15 @@
-﻿using Azure.Identity;
+﻿using System.Diagnostics;
+using System.Text;
+
+using Azure.Identity;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession;
+using Microsoft.Graph.Users.Item.SendMail;
+
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Models;
 using TRENZ.Lib.RazorMail.MSGraph.Extensions;
@@ -11,23 +17,20 @@ using TRENZ.Lib.RazorMail.MSGraph.Models;
 
 namespace TRENZ.Lib.RazorMail.MSGraph;
 
-public class MSGraphMailClient : IMailClient
+public abstract class MSGraphMailClient : IMailClient
 {
-    private readonly ILogger<MSGraphMailClient> _logger;
-    private readonly MSGraphOptions _options;
-    private readonly GraphServiceClient _graphServiceClient;
+    protected readonly ILogger<MSGraphMailClient> Logger;
+    protected readonly MSGraphOptions Options;
+    protected GraphServiceClient? GraphServiceClient = null;
 
     internal MSGraphMailClient(IOptions<MSGraphOptions> accountOptions, ILogger<MSGraphMailClient> logger)
     {
-        if (_graphServiceClient is not null)
+        if (GraphServiceClient is not null)
         {
             return;
         }
-
-        _options = accountOptions.Value;
-        _logger = logger;
-        _graphServiceClient = InitalizeGraphClient();
-        _logger.Log(LogLevel.Information, "Graph client initialized.");
+        Options = accountOptions.Value;
+        Logger = logger;
     }
 
     public MailHeaderCollection DefaultHeaders { get; } = new();
@@ -38,29 +41,21 @@ public class MSGraphMailClient : IMailClient
     }
 
 
-    private GraphServiceClient InitalizeGraphClient()
-    {
-        var tenantId = _options.TenantId;
-        var clientId = _options.ClientId;
-        var clientSecret = _options.ClientSecret;
-
-        var options = new ClientSecretCredentialOptions
-        {
-            AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
-        };
-        var clientSecretCredential = new ClientSecretCredential(
-            tenantId, clientId, clientSecret, options);
-        return new GraphServiceClient(clientSecretCredential);
-    }
-
 
     private async Task SendInternalAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
-        if (message.Headers.From is null)
+        if (GraphServiceClient is null)
         {
-            _logger.LogWarning("Sending mail was not possible since the message has no sender defined");
+            //fixme
             return;
         }
+
+        if (message.Headers.From is null)
+        {
+            Logger.LogWarning("Sending mail was not possible since the message has no sender defined");
+            return;
+        }
+
         var fromMail = message.Headers.From.Email;
         var msMessage = message.ToMSMessage();
         if (message.Content.Attachments.Count > 0)
@@ -68,10 +63,8 @@ public class MSGraphMailClient : IMailClient
             await HandleMessageWithAttachments(msMessage, message, fromMail, cancellationToken);
             return;
         }
-
-        await _graphServiceClient.Users[fromMail].SendMail.PostAsync(
-            msMessage.ToMSMailPostRequestBody(_options.SaveToSentItems), cancellationToken: cancellationToken);
-        _logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
+        await SendMailWithoutAttachments(fromMail, msMessage.ToMSMailPostRequestBody(Options.SaveToSentItems), cancellationToken);
+        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
             fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
     }
 
@@ -82,11 +75,10 @@ public class MSGraphMailClient : IMailClient
             stringToAttachmentValuePair => stringToAttachmentValuePair.Key,
             stringToAttachmentValuePair => stringToAttachmentValuePair.Value.ToFileAttachment());
 
-        var postedMessage = await _graphServiceClient.Users[fromMail].Messages
-            .PostAsync(msMessage, cancellationToken: cancellationToken);
+        var postedMessage = await PostMessageToInbox(fromMail, msMessage, cancellationToken);
         if (postedMessage == null)
         {
-            _logger.LogError(
+            Logger.LogError(
                 "Failed to post message in preparation for attachment upload. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
                 fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
             return;
@@ -104,14 +96,13 @@ public class MSGraphMailClient : IMailClient
             var contentBytesLength = msFileAttachment.Value.ContentBytes.Length;
             if (contentBytesLength < 3e6)
             {
-                await _graphServiceClient.Users[fromMail].Messages[postedMessage.Id].Attachments
-                    .PostAsync(msFileAttachment.Value, cancellationToken: cancellationToken);
+                await AddSmallAttachmentToExistingMessage(fromMail, postedMessage.Id, msFileAttachment.Value, cancellationToken);
                 continue;
             }
 
             if (contentBytesLength > 150e6)
             {
-                _logger.LogWarning(
+                Logger.LogWarning(
                     "Skipping attachment with name {FileName} because its file size exceeds 150 MB. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
                     msFileAttachment.Value.Name, fromMail, msMessage.ToRecipients, msMessage.CcRecipients,
                     msMessage.BccRecipients, msMessage.Subject);
@@ -121,14 +112,12 @@ public class MSGraphMailClient : IMailClient
             await UploadLargerAttachmentViaSession(fromMail, postedMessage.Id, msFileAttachment.Value,
                 cancellationToken);
         }
-
-        await _graphServiceClient.Users[fromMail].Messages[postedMessage.Id].Send
-            .PostAsync(cancellationToken: cancellationToken);
-        _logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
+        await SendPostedMessage(fromMail, postedMessage.Id, cancellationToken);
+        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
             fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
     }
 
-    private async Task UploadLargerAttachmentViaSession(string fromMail, string? postedMessageId,
+    private async Task UploadLargerAttachmentViaSession(string fromMail, string postedMessageId,
         FileAttachment fileAttachment, CancellationToken cancellationToken)
     {
         var fileSize = fileAttachment.ContentBytes.Length;
@@ -141,12 +130,25 @@ public class MSGraphMailClient : IMailClient
                 Size = fileSize
             }
         };
-        var uploadSession = await _graphServiceClient.Users[fromMail].Messages[postedMessageId].Attachments
-            .CreateUploadSession.PostAsync(attachmentUploadRequestBody, cancellationToken: cancellationToken);
-
+        var uploadSession = await GetUploadSessionForMessage(fromMail, postedMessageId, attachmentUploadRequestBody, cancellationToken);
         using var stream = new MemoryStream(fileAttachment.ContentBytes);
         var largeFileUploadTask =
             new LargeFileUploadTask<FileAttachment>(uploadSession, stream);
         await largeFileUploadTask.UploadAsync(cancellationToken: cancellationToken);
     }
+
+    protected abstract Task<UploadSession> GetUploadSessionForMessage(string fromMail, string postedMessageId,
+        CreateUploadSessionPostRequestBody requestBody,
+        CancellationToken cancellationToken);
+
+    protected abstract Task<Message?>
+        PostMessageToInbox(string fromMail, Message message, CancellationToken cancellationToken);
+
+    protected abstract Task SendPostedMessage(string fromMail, string messageId, CancellationToken cancellationToken);
+
+    protected abstract Task AddSmallAttachmentToExistingMessage(string fromMail, string messageId,
+        FileAttachment fileAttachment,
+        CancellationToken cancellationToken);
+
+    protected abstract Task SendMailWithoutAttachments(string fromMail, SendMailPostRequestBody sendMailPostRequestBody, CancellationToken cancellationToken);
 }

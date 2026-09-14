@@ -11,4 +11,6 @@ public record MSGraphOptions
     //fixme uhhhhhh
     public required string ClientSecret { get; init; }
     public required bool SaveToSentItems { get; init; }
+    //fixme enum ?
+    public required string? RedirectUri { get; init; }
 }

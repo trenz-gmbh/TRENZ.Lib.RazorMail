@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.Models;
+using TRENZ.Lib.RazorMail.MSGraph;
 using TRENZ.Lib.RazorMail.SampleWebApi.Models;
 
 namespace TRENZ.Lib.RazorMail.SampleWebApi.Controllers;
@@ -13,7 +14,8 @@ public class MailController(
     : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> SendWithSystemNet([FromBody] SendSampleMailRequest request, [FromKeyedServices("System.Net.Mail")] IMailClient client)
+    public async Task<IActionResult> SendWithSystemNet([FromBody] SendSampleMailRequest request,
+        [FromKeyedServices("System.Net.Mail")] IMailClient client)
     {
         var message = await MakeMessage(request);
 
@@ -23,7 +25,8 @@ public class MailController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> SendWithMailKit([FromBody] SendSampleMailRequest request, [FromKeyedServices("MailKit")] IMailClient client)
+    public async Task<IActionResult> SendWithMailKit([FromBody] SendSampleMailRequest request,
+        [FromKeyedServices("MailKit")] IMailClient client)
     {
         var message = await MakeMessage(request);
 
@@ -33,7 +36,8 @@ public class MailController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> SendWithMSGraph([FromBody] SendSampleMailRequest request, [FromKeyedServices("MSGraph")] IMailClient client)
+    public async Task<IActionResult> SendWithMSGraph([FromBody] SendSampleMailRequest request,
+        [FromKeyedServices("MSGraph")] IMailClient client)
     {
         var message = await MakeMessage(request);
 
@@ -41,6 +45,19 @@ public class MailController(
 
         return Ok();
     }
+
+    [HttpGet]
+    public async Task<IActionResult> AuthcodeReceiver([FromQuery(Name = "code")] string authcode,  [FromKeyedServices("MSGraph")] IMailClient client)
+    {
+        if (client is MsGraphDelegatedMailClient)
+        {
+            await ((MsGraphDelegatedMailClient) client).InitializeGraphClientViaAuthCode(authcode);
+            return Ok();
+        }
+        //fixme return smth better
+        return BadRequest();
+    }
+
 
     private async Task<MailMessage> MakeMessage(SendSampleMailRequest request)
     {
