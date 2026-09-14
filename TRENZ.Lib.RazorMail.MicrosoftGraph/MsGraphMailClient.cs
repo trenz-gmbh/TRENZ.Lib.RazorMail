@@ -62,14 +62,33 @@ public abstract class MsGraphMailClient : IMailClient
         var msMessage = message.ToMsMessage();
         if (message.Content.Attachments.Count > 0)
         {
-            await HandleMessageWithAttachments(msMessage, message, fromMail, cancellationToken);
+            if (message.Content.Attachments.Any(keyValuePair =>
+                    keyValuePair.Value.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession))
+            {
+                await HandleMessageWithAttachments(msMessage, message, fromMail, cancellationToken);
+                return;
+            }
+
+            await HandleMessageWithOnlySmallAttachments(msMessage, message, fromMail, cancellationToken);
             return;
         }
 
-        await SendMailWithoutAttachments(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems),
+        await SendMailDirectly(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems),
             cancellationToken);
         Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
             fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
+    }
+
+    private async Task HandleMessageWithOnlySmallAttachments(Message msMessage, MailMessage message, string fromMail,
+        CancellationToken cancellationToken)
+    {
+        List<Attachment> msFileAttachments =
+        [
+            .. message.Content.Attachments.Values.Select(Attachment (mailAttachment) =>
+                mailAttachment.ToFileAttachment())
+        ];
+        msMessage.Attachments = msFileAttachments;
+        await SendMailDirectly(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems), cancellationToken);
     }
 
     private async Task HandleMessageWithAttachments(Message msMessage, MailMessage message, string fromMail,
@@ -158,6 +177,6 @@ public abstract class MsGraphMailClient : IMailClient
         FileAttachment fileAttachment,
         CancellationToken cancellationToken);
 
-    protected abstract Task SendMailWithoutAttachments(string fromMail, SendMailPostRequestBody sendMailPostRequestBody,
+    protected abstract Task SendMailDirectly(string fromMail, SendMailPostRequestBody sendMailPostRequestBody,
         CancellationToken cancellationToken);
 }

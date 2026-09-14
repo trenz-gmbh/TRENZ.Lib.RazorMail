@@ -152,7 +152,7 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         await func.Invoke();
     }
 
-    protected override async Task SendMailWithoutAttachments(string fromMail,
+    protected override async Task SendMailDirectly(string fromMail,
         SendMailPostRequestBody sendMailPostRequestBody,
         CancellationToken cancellationToken)
     {

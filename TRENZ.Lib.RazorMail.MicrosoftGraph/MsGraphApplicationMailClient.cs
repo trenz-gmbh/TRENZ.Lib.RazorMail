@@ -65,7 +65,7 @@ public class MsGraphApplicationMailClient : MsGraphMailClient
             .PostAsync(fileAttachment, cancellationToken: cancellationToken);
     }
 
-    protected override async Task SendMailWithoutAttachments(string fromMail,
+    protected override async Task SendMailDirectly(string fromMail,
         SendMailPostRequestBody sendMailPostRequestBody,
         CancellationToken cancellationToken)
     {
