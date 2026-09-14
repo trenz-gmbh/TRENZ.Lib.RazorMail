@@ -16,6 +16,8 @@ namespace TRENZ.Lib.RazorMail.MSGraph;
 
 public abstract class MsGraphMailClient : IMailClient
 {
+    private const double MaxSizeAttachmentsMbWithoutUploadSession = 3e6;
+    private const double MaxSizeAttachments = 150e6;
     protected readonly ILogger<MsGraphMailClient> Logger;
     protected readonly MsGraphOptions Options;
     protected GraphServiceClient? GraphServiceClient = null;
@@ -78,7 +80,7 @@ public abstract class MsGraphMailClient : IMailClient
             stringToAttachmentValuePair => stringToAttachmentValuePair.Value.ToFileAttachment());
 
         var postedMessage = await PostMessageToInbox(fromMail, msMessage, cancellationToken);
-        if (postedMessage?.Id is null )
+        if (postedMessage?.Id is null)
         {
             Logger.LogError(
                 "Failed to post message in preparation for attachment upload. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject: {Subject}",
@@ -96,14 +98,15 @@ public abstract class MsGraphMailClient : IMailClient
              * It is not clear what exactly 3 MB constitutes for MS therefore we go with SI unit.
              */
             var contentBytesLength = msFileAttachment.Value.ContentBytes!.Length;
-            if (contentBytesLength < 3e6)
+
+            if (contentBytesLength < MaxSizeAttachmentsMbWithoutUploadSession)
             {
                 await AddSmallAttachmentToExistingMessage(fromMail, postedMessage.Id, msFileAttachment.Value,
                     cancellationToken);
                 continue;
             }
 
-            if (contentBytesLength > 150e6)
+            if (contentBytesLength > MaxSizeAttachments)
             {
                 Logger.LogWarning(
                     "Skipping attachment with name {FileName} because its file size exceeds 150 MB. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
@@ -124,7 +127,7 @@ public abstract class MsGraphMailClient : IMailClient
     private async Task UploadLargerAttachmentViaSession(string fromMail, string postedMessageId,
         FileAttachment fileAttachment, CancellationToken cancellationToken)
     {
-        var fileSize = fileAttachment.ContentBytes.Length;
+        var fileSize = fileAttachment.ContentBytes!.Length;
         var attachmentUploadRequestBody = new CreateUploadSessionPostRequestBody
         {
             AttachmentItem = new AttachmentItem
