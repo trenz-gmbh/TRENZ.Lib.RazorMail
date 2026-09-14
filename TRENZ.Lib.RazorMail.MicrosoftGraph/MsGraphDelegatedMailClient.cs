@@ -18,12 +18,12 @@ namespace TRENZ.Lib.RazorMail.MSGraph;
 
 public class MsGraphDelegatedMailClient : MsGraphMailClient
 {
-    private User _user;
+    private User? _user = null;
 
     public MsGraphDelegatedMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
         base(accountOptions, logger)
     {
-        CallMSLoginPage();
+        CallMsLoginPage();
     }
 
     public async Task InitializeGraphClientViaAuthCode(string authCode)
@@ -54,8 +54,8 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         var authCodeCredential = new AuthorizationCodeCredential(
             tenantId, clientId, clientSecret, authCode, options);
 
-        GraphServiceClient = new GraphServiceClient(authCodeCredential, scopes);
-        var me = await GraphServiceClient.Me.GetAsync();
+        var graphServiceClient = new GraphServiceClient(authCodeCredential, scopes);
+        var me = await graphServiceClient.Me.GetAsync();
         if (me is null)
         {
             Logger.LogError("Could not authenticate a user with given settings");
@@ -63,10 +63,11 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         }
 
         _user = me;
+        GraphServiceClient = graphServiceClient;
         Logger.LogInformation("Delegated GrapService started for user: {name}", _user.DisplayName);
     }
 
-    public void CallMSLoginPage()
+    private void CallMsLoginPage()
     {
         var scopes = new[] { "User.Read", "Mail.ReadWrite", "Mail.Send" };
         if (Options.Scopes is not null)

@@ -8,12 +8,10 @@ public record MsGraphOptions
 
     public required string ClientId { get; init; }
 
-    //fixme uhhhhhh
     public required string ClientSecret { get; init; }
 
     public required bool SaveToSentItems { get; init; }
 
-    //fixme enum ?
     public string? RedirectUri { get; init; }
     public string[]? Scopes { get; init; }
 }

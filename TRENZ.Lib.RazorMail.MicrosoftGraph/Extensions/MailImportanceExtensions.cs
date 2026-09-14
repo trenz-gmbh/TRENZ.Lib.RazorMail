@@ -8,16 +8,11 @@ public static class MailImportanceExtensions
 {
     public static Importance ToMsImportance(this MailImportance importance)
     {
-        switch (importance)
+        return importance switch
         {
-            case MailImportance.High:
-                return Importance.High;
-            case MailImportance.Low:
-                return Importance.Low;
-            case MailImportance.Normal:
-                return Importance.Normal;
-            default:
-                return Importance.Normal;
-        }
+            MailImportance.High => Importance.High,
+            MailImportance.Low => Importance.Low,
+            _ => Importance.Normal
+        };
     }
 }

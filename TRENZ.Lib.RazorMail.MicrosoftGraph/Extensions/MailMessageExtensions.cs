@@ -45,9 +45,9 @@ public static class MailMessageExtensions
         };
     }
 
-    private static MSRecipients ExtractRecipientsFromHeader(MailHeaderCollection headerCollection)
+    private static MsRecipients ExtractRecipientsFromHeader(MailHeaderCollection headerCollection)
     {
-        var msRecipients = new MSRecipients();
+        var msRecipients = new MsRecipients();
         foreach (var domainRecipients in headerCollection.Recipients)
         {
             msRecipients.ToRecipients.Add(
@@ -92,11 +92,11 @@ public static class MailMessageExtensions
     }
 
 
-    private class MSRecipients
+    private class MsRecipients
     {
-        public List<Recipient> ToRecipients { get; } = new();
-        public List<Recipient> CcRecipients { get; } = new();
-        public List<Recipient> BccRecipients { get; } = new();
-        public List<Recipient> ReplyRecipients { get; } = new();
+        public List<Recipient> ToRecipients { get; } = [];
+        public List<Recipient> CcRecipients { get; } = [];
+        public List<Recipient> BccRecipients { get; } = [];
+        public List<Recipient> ReplyRecipients { get; } = [];
     }
 }
