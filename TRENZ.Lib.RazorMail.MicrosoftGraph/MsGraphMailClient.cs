@@ -87,7 +87,7 @@ public abstract class MsGraphMailClient : IMailClient
     {
         List<Attachment> msFileAttachments =
         [
-            .. message.Content.Attachments.Values.Select(attachment => attachment.ToFileAttachment())
+            .. message.Content.Attachments.Values.Select(attachment => attachment.ToMsFileAttachment())
         ];
         msMessage.Attachments = msFileAttachments;
         await SendMailDirectly(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems), cancellationToken);
@@ -99,7 +99,7 @@ public abstract class MsGraphMailClient : IMailClient
     {
         var msFileAttachments = message.Content.Attachments.ToDictionary(
             stringToAttachmentValuePair => stringToAttachmentValuePair.Key,
-            stringToAttachmentValuePair => stringToAttachmentValuePair.Value.ToFileAttachment());
+            stringToAttachmentValuePair => stringToAttachmentValuePair.Value.ToMsFileAttachment());
 
         var postedMessage = await PostMessageToInbox(fromMail, msMessage, cancellationToken);
         if (postedMessage?.Id is null)

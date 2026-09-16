@@ -6,7 +6,7 @@ namespace TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
 
 public static class MailAttachmentExtensions
 {
-    public static FileAttachment ToFileAttachment(this MailAttachment mailAttachment)
+    public static FileAttachment ToMsFileAttachment(this MailAttachment mailAttachment)
     {
         var attachment = new FileAttachment
         {

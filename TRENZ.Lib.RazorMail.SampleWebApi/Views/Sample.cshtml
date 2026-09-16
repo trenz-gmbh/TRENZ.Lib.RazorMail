@@ -1,13 +1,10 @@
-@inherits TRENZ.Lib.RazorMail.Core.MailTemplateBase<TRENZ.Lib.RazorMail.SampleWebApi.Models.SampleModel>
+@using TRENZ.Lib.RazorMail.SampleWebApi.Models
+
+@inherits TRENZ.Lib.RazorMail.Core.MailTemplateBase<SampleModel>
 
 @{
     Subject = "Greetings!";
 }
-
-@{
-    AttachFile("swarm.png", await File.ReadAllBytesAsync("./Views/Assets/the-swarm.png"));
-}
-
 
 <!DOCTYPE html>
 

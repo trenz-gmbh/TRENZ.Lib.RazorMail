@@ -21,13 +21,13 @@ elevated with C# — you get `@foreach`, `@switch`, and so on, _and_ you get a s
 In NuGet, reference one of the available packages, depending on which `MailSender` backend you prefer. Currently, there
 are three available:
 
-* [MailKit](https://github.com/jstedfast/MailKit) is more modern and powerful and can be referenced via
-  `TRENZ.Lib.RazorMail.MailKit`
 * `System.Net.Mail` comes built into .NET and can be referenced via `TRENZ.Lib.RazorMail.SystemNet`
-* Using the [Mircosoft Graph API](https://learn.microsoft.com/en-us/graph/overview) it is possible to send Mails via
-  Outlook without using SMTP. It can be referenced via `TRENZ.Lib.RazorMail.MicrosoftGraph`.
+* [MailKit](https://github.com/jstedfast/MailKit) is more modern and powerful than `System.Net.Mail` and can be referenced via
+  `TRENZ.Lib.RazorMail.MailKit`
+* Using the [Microsoft Graph API](https://learn.microsoft.com/en-us/graph/overview) it is possible to send Mails via
+  the Microsoft 365 / Outlook.com service without using SMTP. It can be referenced via `TRENZ.Lib.RazorMail.MicrosoftGraph`.
 
-There is no need to reference `TRENZ.Lib.RazorMail` directly.
+There is no need to reference `TRENZ.Lib.RazorMail.Core` directly.
 
 Via dotnet:
 
@@ -121,7 +121,7 @@ For example, to show an image inline, you simply do:
 ```
 
 That's it. This attaches the image as a file, then references it using `cid` format[^1]. Because the image is attached,
-this also doesn't require your users to enable loading external images, which some mail clients restricts for privacy
+this also doesn't require your users to enable loading external images, which some mail clients restrict for privacy
 reasons.
 
 [^1]: Each attachment becomes part of a [MIME multipart message](https://en.wikipedia.org/wiki/MIME#Multipart_messages),
@@ -186,7 +186,7 @@ await client.SendAsync(mail);
 ## Microsoft Graph Considerations
 
 The Microsoft Graph API (MsGraph) is a powerful API provided by Microsoft. There are currently two modes in which this
-Liberary can be used with MsGraph. It is able to send mails either on behalf of user (delegated) or as every user in a
+library can be used with MsGraph. It is able to send mails either on behalf of user (delegated) or as every user in a
 tenant (application). Configuration of the MsGraph portion of this library is done via the `appsettings.json` file.
 Example `.json` file:
 
