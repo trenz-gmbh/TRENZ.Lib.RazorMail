@@ -19,7 +19,6 @@ public class MsGraphApplicationMailClient : MsGraphMailClient
         InitializeGraphClient();
     }
 
-
     private void InitializeGraphClient()
     {
         var tenantId = Options.TenantId;

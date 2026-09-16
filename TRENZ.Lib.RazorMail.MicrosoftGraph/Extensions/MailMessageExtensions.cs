@@ -66,7 +66,6 @@ public static class MailMessageExtensions
         return msRecipients;
     }
 
-
     private class MsRecipients
     {
         public List<Recipient> ToRecipients { get; } = [];

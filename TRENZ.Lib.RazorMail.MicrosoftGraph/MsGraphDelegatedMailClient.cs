@@ -100,7 +100,6 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         });
     }
 
-
     protected override async Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
         CreateUploadSessionPostRequestBody requestBody,
         CancellationToken cancellationToken)
@@ -141,7 +140,6 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
             .PostAsync(fileAttachment, cancellationToken: cancellationToken);
     }
 
-
     protected override async Task SendMailDirectly(string fromMail,
         SendMailPostRequestBody sendMailPostRequestBody,
         CancellationToken cancellationToken)
@@ -154,7 +152,6 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         await GraphServiceClient!.Me.SendMail
             .PostAsync(requestBody, cancellationToken: cancellationToken);
     }
-
 
     private void EnsureFromMailIsUserMail(string fromMail)
     {
