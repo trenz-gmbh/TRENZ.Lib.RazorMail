@@ -48,6 +48,16 @@ public class MailController(
                 request.FileAmount ?? 1);
         }
 
+        if (request.Importance is not null)
+        {
+            message.Headers.Importance = request.Importance.ToLower() switch
+            {
+                "low" => MailImportance.Low,
+                "high" => MailImportance.High,
+                _ => MailImportance.Normal
+            };
+        }
+
         try
         {
             await client.SendAsync(message);

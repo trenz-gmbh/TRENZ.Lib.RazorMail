@@ -40,10 +40,10 @@ public record MsGraphOptions
     /// </summary>
     public required string TenantId { get; init; }
 
-
     /// <summary>
-    /// This gives the option to not use the way Microsoft recommends and simply attempt to always attach attachments directly to the mail.
-    /// Regardless of size.
+    ///     This gives the option to not use the way Microsoft recommends and simply attempt to always attach attachments
+    ///     directly to the mail.
+    ///     Regardless of size.
     /// </summary>
     public required bool UseUploadSessions { get; init; }
 }
