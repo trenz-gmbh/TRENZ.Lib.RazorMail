@@ -12,6 +12,12 @@ public record MsGraphOptions
 
     public string? RedirectUri { get; init; }
 
+    /// <summary>
+    /// This setting prevets mail from being saved to sent items if there are no attachments
+    /// or if all present attachments are under 3MB.
+    /// If any attachment is over 3MB the message needs to created beforehand to upload the attachment to it.
+    /// At that stage the api currently has no option to not save it to sent items.
+    /// </summary>
     public required bool SaveToSentItems { get; init; }
 
     public required string TenantId { get; init; }
