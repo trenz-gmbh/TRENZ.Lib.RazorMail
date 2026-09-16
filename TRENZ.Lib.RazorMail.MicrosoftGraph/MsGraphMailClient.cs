@@ -57,8 +57,8 @@ public abstract class MsGraphMailClient : IMailClient
         var msMessage = message.ToMsMessage();
         if (message.Content.Attachments.Count > 0)
         {
-            if (message.Content.Attachments.Any(keyValuePair =>
-                    keyValuePair.Value.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession))
+            if (message.Content.Attachments.Values.Any(mailAttachment =>
+                    mailAttachment.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession))
             {
                 await HandleMessageWithLargerAttachments(msMessage, message, fromMail, cancellationToken);
                 return;
@@ -70,8 +70,7 @@ public abstract class MsGraphMailClient : IMailClient
 
         await SendMailDirectly(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems),
             cancellationToken);
-        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
-            fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
+        LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
     }
 
     private async Task HandleMessageWithOnlySmallAttachments(Message msMessage, MailMessage message, string fromMail,
@@ -96,9 +95,8 @@ public abstract class MsGraphMailClient : IMailClient
         var postedMessage = await PostMessageToInbox(fromMail, msMessage, cancellationToken);
         if (postedMessage?.Id is null)
         {
-            Logger.LogError(
-                "Failed to post message in preparation for attachment upload. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject: {Subject}",
-                fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
+            LogMailSpecificMessage("Failed to post message in preparation for attachment upload.", msMessage, fromMail,
+                LogLevel.Error);
             return;
         }
 
@@ -122,10 +120,9 @@ public abstract class MsGraphMailClient : IMailClient
 
             if (contentBytesLength > MaxSizeAttachments)
             {
-                Logger.LogWarning(
-                    "Skipping attachment with name {FileName} because its file size exceeds 150 MB. For mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
-                    msFileAttachment.Value.Name, fromMail, msMessage.ToRecipients, msMessage.CcRecipients,
-                    msMessage.BccRecipients, msMessage.Subject);
+                LogMailSpecificMessage(
+                    $"Skipping attachment with name {msFileAttachment.Value.Name} because its file size exceeds 150 MB",
+                    msMessage, fromMail, LogLevel.Warning);
                 continue;
             }
 
@@ -134,8 +131,7 @@ public abstract class MsGraphMailClient : IMailClient
         }
 
         await SendPostedMessage(fromMail, postedMessage.Id, cancellationToken);
-        Logger.LogInformation("Sending mail from {From} to {Recipients} (CC: {Cc}, BCC: {Bcc}) with subject {Subject}",
-            fromMail, msMessage.ToRecipients, msMessage.CcRecipients, msMessage.BccRecipients, msMessage.Subject);
+        LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
     }
 
     private async Task UploadLargerAttachmentViaSession(string fromMail, string postedMessageId,
@@ -157,6 +153,13 @@ public abstract class MsGraphMailClient : IMailClient
         var largeFileUploadTask =
             new LargeFileUploadTask<FileAttachment>(uploadSession, stream);
         await largeFileUploadTask.UploadAsync(cancellationToken: cancellationToken);
+    }
+
+    private void LogMailSpecificMessage(string message, Message msMessage, string fromMail, LogLevel logLevel)
+    {
+        var messageSuffix =
+            $"For mail from {fromMail} to {msMessage.ToRecipients} (CC: {msMessage.CcRecipients}, BCC: {msMessage.BccRecipients}) with subject {msMessage.Subject}";
+        Logger.Log(logLevel, "{message}\n{messageSuffix}", message, messageSuffix);
     }
 
     protected abstract Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
