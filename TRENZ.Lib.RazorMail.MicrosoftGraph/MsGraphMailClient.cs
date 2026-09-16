@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -6,6 +7,7 @@ using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession;
 using Microsoft.Graph.Users.Item.SendMail;
+using Microsoft.VisualBasic;
 
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
@@ -60,6 +62,13 @@ public abstract class MsGraphMailClient : IMailClient
             if (message.Content.Attachments.Values.Any(mailAttachment =>
                     mailAttachment.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession))
             {
+                /*
+                 * https://learn.microsoft.com/en-us/graph/outlook-large-attachments
+                 *
+                 * If under 3 MB we are supposed to add it directly to the message
+                 * else we need to create an upload session.
+                 * It is not clear what exactly 3 MB constitutes for MS therefore we go with SI unit.
+                 */
                 await HandleMessageWithLargerAttachments(msMessage, message, fromMail, cancellationToken);
                 return;
             }
@@ -78,11 +87,11 @@ public abstract class MsGraphMailClient : IMailClient
     {
         List<Attachment> msFileAttachments =
         [
-            .. message.Content.Attachments.Values.Select(Attachment (mailAttachment) =>
-                mailAttachment.ToFileAttachment())
+            .. message.Content.Attachments.Values.Select(attachment => attachment.ToFileAttachment())
         ];
         msMessage.Attachments = msFileAttachments;
         await SendMailDirectly(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems), cancellationToken);
+        LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
     }
 
     private async Task HandleMessageWithLargerAttachments(Message msMessage, MailMessage message, string fromMail,
@@ -102,13 +111,6 @@ public abstract class MsGraphMailClient : IMailClient
 
         foreach (var msFileAttachment in msFileAttachments)
         {
-            /*
-             * https://learn.microsoft.com/en-us/graph/outlook-large-attachments
-             *
-             * If under 3 MB we are supposed to add it directly to the message
-             * else we need to create an upload session.
-             * It is not clear what exactly 3 MB constitutes for MS therefore we go with SI unit.
-             */
             var contentBytesLength = msFileAttachment.Value.ContentBytes!.Length;
 
             if (contentBytesLength < MaxSizeAttachmentsMbWithoutUploadSession)
@@ -157,8 +159,14 @@ public abstract class MsGraphMailClient : IMailClient
 
     private void LogMailSpecificMessage(string message, Message msMessage, string fromMail, LogLevel logLevel)
     {
+        var recipients = string.Join(" , ",
+            msMessage.ToRecipients!.Select(recipient => recipient.EmailAddress!.Address));
+        var ccRecipients = string.Join(" , ",
+            msMessage.CcRecipients!.Select(recipient => recipient.EmailAddress!.Address));
+        var bccRecipients = string.Join(" , ",
+            msMessage.BccRecipients!.Select(recipient => recipient.EmailAddress!.Address));
         var messageSuffix =
-            $"For mail from {fromMail} to {msMessage.ToRecipients} (CC: {msMessage.CcRecipients}, BCC: {msMessage.BccRecipients}) with subject {msMessage.Subject}";
+            $"For mail from {fromMail} to {recipients} (CC: {ccRecipients}, BCC: {bccRecipients}) with subject: \"{msMessage.Subject}\"";
         Logger.Log(logLevel, "{message}\n{messageSuffix}", message, messageSuffix);
     }
 
