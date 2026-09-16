@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Text;
 
 using Azure.Identity;
 
@@ -83,19 +82,18 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     public void CallMsLoginPage()
     {
         var scopes = new[] { "User.Read", "Mail.ReadWrite", "Mail.Send" };
-        var stringBuilder = new StringBuilder("https://login.microsoftonline.com/");
-        stringBuilder.Append(Options.TenantId).Append("/oauth2/v2.0/authorize?client_id=");
-        stringBuilder.Append(Options.ClientId).Append("&response_type=code");
-        stringBuilder.Append("&redirect_uri=").Append(Options.RedirectUri);
-        stringBuilder.Append("&response_mode=query&scope=offline_access");
-        foreach (var scope in scopes)
+
+        var uriBuilder = new UriBuilder(
+            $"https://login.microsoftonline.com/{Options.TenantId}/oauth2/v2.0/authorize")
         {
-            stringBuilder.Append("%20").Append(scope);
-        }
+            Query = string.Join("&", $"client_id={Options.ClientId}", "response_type=code",
+                $"redirect_uri={Options.RedirectUri}", "response_mode=query",
+                $"scope={"offline_access " + string.Join(" ", scopes)}")
+        };
 
         Process.Start(new ProcessStartInfo
         {
-            FileName = stringBuilder.ToString(),
+            FileName = uriBuilder.ToString(),
             UseShellExecute = true
         });
     }

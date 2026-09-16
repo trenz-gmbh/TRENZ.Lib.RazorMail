@@ -61,7 +61,7 @@ public class MailController(
 
     //fixme ask sören why async
     [HttpPost]
-    public async Task<IActionResult> StartMsAuthenticationProcess([FromKeyedServices("MsGraph")] IMailClient client)
+    public IActionResult StartMsAuthenticationProcess([FromKeyedServices("MsGraph")] IMailClient client)
     {
         if (client is not MsGraphDelegatedMailClient mailClient)
         {
