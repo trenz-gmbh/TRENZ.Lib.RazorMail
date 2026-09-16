@@ -105,66 +105,54 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         CreateUploadSessionPostRequestBody requestBody,
         CancellationToken cancellationToken)
     {
-        return (UploadSession?)await DoMailTaskWithChecks<object?>(fromMail, async () =>
-        {
-            Microsoft.Graph.Me.Messages.Item.Attachments.CreateUploadSession.CreateUploadSessionPostRequestBody
-                request =
-                    new()
-                    {
-                        AttachmentItem = requestBody.AttachmentItem
-                    };
-            return await GraphServiceClient!.Me.Messages[postedMessageId].Attachments
-                .CreateUploadSession.PostAsync(request, cancellationToken: cancellationToken);
-        });
+        EnsureFromMailIsUserMail(fromMail);
+        Microsoft.Graph.Me.Messages.Item.Attachments.CreateUploadSession.CreateUploadSessionPostRequestBody
+            request =
+                new()
+                {
+                    AttachmentItem = requestBody.AttachmentItem
+                };
+        return await GraphServiceClient!.Me.Messages[postedMessageId].Attachments
+            .CreateUploadSession.PostAsync(request, cancellationToken: cancellationToken);
     }
 
     protected override async Task<Message?> PostMessageToInbox(string fromMail, Message message,
         CancellationToken cancellationToken)
     {
-        return (Message?)await DoMailTaskWithChecks<object?>(fromMail, async () => await GraphServiceClient!.Me.Messages
-            .PostAsync(message, cancellationToken: cancellationToken));
+        EnsureFromMailIsUserMail(fromMail);
+        return await GraphServiceClient!.Me.Messages
+            .PostAsync(message, cancellationToken: cancellationToken);
     }
 
     protected override async Task SendPostedMessage(string fromMail, string messageId,
         CancellationToken cancellationToken)
     {
-        await DoMailTaskWithChecks(fromMail, async () => await GraphServiceClient!.Me.Messages[messageId].Send
-            .PostAsync(cancellationToken: cancellationToken));
+        EnsureFromMailIsUserMail(fromMail);
+        await GraphServiceClient!.Me.Messages[messageId].Send
+            .PostAsync(cancellationToken: cancellationToken);
     }
 
     protected override async Task AddSmallAttachmentToExistingMessage(string fromMail, string messageId,
         FileAttachment fileAttachment,
         CancellationToken cancellationToken)
     {
-        await DoMailTaskWithChecks(fromMail, async () => await GraphServiceClient!.Me.Messages[messageId].Attachments
-            .PostAsync(fileAttachment, cancellationToken: cancellationToken));
+        EnsureFromMailIsUserMail(fromMail);
+        await GraphServiceClient!.Me.Messages[messageId].Attachments
+            .PostAsync(fileAttachment, cancellationToken: cancellationToken);
     }
 
-    private async Task<object?> DoMailTaskWithChecks<T>(string fromMail, Func<Task<T>> func)
-    {
-        EnsureFromMailIsUserMail(fromMail);
-        return await func.Invoke();
-    }
-
-    private async Task DoMailTaskWithChecks(string fromMail, Func<Task> func)
-    {
-        EnsureFromMailIsUserMail(fromMail);
-        await func.Invoke();
-    }
 
     protected override async Task SendMailDirectly(string fromMail,
         SendMailPostRequestBody sendMailPostRequestBody,
         CancellationToken cancellationToken)
     {
-        await DoMailTaskWithChecks(fromMail, async () =>
+        EnsureFromMailIsUserMail(fromMail);
+        Microsoft.Graph.Me.SendMail.SendMailPostRequestBody requestBody = new()
         {
-            Microsoft.Graph.Me.SendMail.SendMailPostRequestBody requestBody = new()
-            {
-                Message = sendMailPostRequestBody.Message
-            };
-            await GraphServiceClient!.Me.SendMail
-                .PostAsync(requestBody, cancellationToken: cancellationToken);
-        });
+            Message = sendMailPostRequestBody.Message
+        };
+        await GraphServiceClient!.Me.SendMail
+            .PostAsync(requestBody, cancellationToken: cancellationToken);
     }
 
 

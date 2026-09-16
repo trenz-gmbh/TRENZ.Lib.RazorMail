@@ -59,22 +59,17 @@ public class MailController(
         return Ok();
     }
 
+    //fixme ask sören why async
     [HttpPost]
-    public Task<IActionResult> StartMsAuthenticationProcess([FromKeyedServices("MsGraph")] IMailClient client)
+    public async Task<IActionResult> StartMsAuthenticationProcess([FromKeyedServices("MsGraph")] IMailClient client)
     {
-        try
+        if (client is not MsGraphDelegatedMailClient mailClient)
         {
-            if (client is not MsGraphDelegatedMailClient mailClient)
-            {
-                return Task.FromResult<IActionResult>(BadRequest("RazorMail MsGraph is not in delegated mode"));
-            }
-            mailClient.CallMsLoginPage();
-            return Task.FromResult<IActionResult>(Ok());
+            return BadRequest("RazorMail MsGraph is not in delegated mode");
         }
-        catch (Exception exception)
-        {
-            return Task.FromException<IActionResult>(exception);
-        }
+
+        mailClient.CallMsLoginPage();
+        return Ok();
     }
 
     private async Task<MailMessage> MakeMessage(SendSampleMailRequest request)
@@ -87,11 +82,11 @@ public class MailController(
         var message = new MailMessage
         {
             Content = renderedMail,
-            Headers = new()
+            Headers = new MailHeaderCollection
             {
                 From = request.From,
-                Recipients = request.To.Select(x => new MailAddress(x)),
-            },
+                Recipients = request.To.Select(x => new MailAddress(x))
+            }
         };
 
         return message;

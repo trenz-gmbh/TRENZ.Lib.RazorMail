@@ -18,23 +18,19 @@ public abstract class MsGraphMailClient : IMailClient
 {
     private const double MaxSizeAttachmentsMbWithoutUploadSession = 3e6;
     private const double MaxSizeAttachments = 150e6;
+
+    /// <inheritdoc />
+    public MailHeaderCollection DefaultHeaders { get; } = new();
+
     protected readonly ILogger<MsGraphMailClient> Logger;
     protected readonly MsGraphOptions Options;
     protected GraphServiceClient? GraphServiceClient = null;
 
     internal MsGraphMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger)
     {
-        if (GraphServiceClient is not null)
-        {
-            return;
-        }
-
         Options = accountOptions.Value;
         Logger = logger;
     }
-
-    public MailHeaderCollection DefaultHeaders { get; } = new();
-
 
     /// <inheritdoc />
     [MemberNotNull(nameof(GraphServiceClient))]
@@ -43,12 +39,11 @@ public abstract class MsGraphMailClient : IMailClient
         await SendInternalAsync(message, cancellationToken);
     }
 
-
     private async Task SendInternalAsync(MailMessage message, CancellationToken cancellationToken = default)
     {
         if (GraphServiceClient is null)
         {
-            Logger.LogWarning("A mail was attempted to be send but there is no GraphServiceClient initialized");
+            Logger.LogWarning("A mail was attempted to be sent but there is no GraphServiceClient initialized");
             return;
         }
 
