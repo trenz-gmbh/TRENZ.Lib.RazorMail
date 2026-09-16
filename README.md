@@ -188,7 +188,7 @@ await client.SendAsync(mail);
 The Microsoft Graph API (MsGraph) is a powerful API provided by Microsoft. There are currently two modes in which this
 library can be used with MsGraph. It is able to send mails either on behalf of user (delegated) or as every user in a
 tenant (application). Configuration of the MsGraph portion of this library is done via the `appsettings.json` file.
-Example `.json` file:
+Example `.json` section:
 
 ```json
 {
@@ -198,15 +198,16 @@ Example `.json` file:
     "ClientSecret": "your_secret",
     "SaveToSentItems": false,
     "RedirectUri": "your_redirect_id",
-    "Delegated": true
+    "Delegated": true,
+    "UseUploadSessions": true
   }
 }
 ```
 
-In order for the MsGraph portion of this library to be able to work properly it needs to have proper permissions set for
+In order for the MsGraph portion of this library to be able to work properly, it needs to have proper permissions set for
 your chosen mode. MsGraph uses
 the [Microsoft identity platform](https://learn.microsoft.com/en-us/entra/identity-platform/v2-overview) to handle
-authentication. To be able to use this platform an app registration via
+authentication. To be able to use this platform, an app registration via
 the [Microsoft Entra Admin center](https://entra.microsoft.com/) is needed. A reference and starting point can be
 found [here](https://learn.microsoft.com/en-us/graph/auth/auth-concepts).
 `TenantId` and `ClientId` can be found in that app registration, the `ClientSecret` can be created there as well. Note
