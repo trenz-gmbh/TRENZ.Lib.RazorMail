@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 
 using TRENZ.Lib.RazorMail.Interfaces;
 using TRENZ.Lib.RazorMail.MicrosoftGraph;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Exceptions;
 using TRENZ.Lib.RazorMail.Models;
+using TRENZ.Lib.RazorMail.SampleWebApi.Helpers;
 using TRENZ.Lib.RazorMail.SampleWebApi.Models;
 
 namespace TRENZ.Lib.RazorMail.SampleWebApi.Controllers;
@@ -36,14 +38,25 @@ public class MailController(
     }
 
     [HttpPost]
-    public async Task<IActionResult> SendWithMsGraph([FromBody] SendSampleMailRequest request,
+    public async Task<IActionResult> SendWithMsGraph([FromBody] SendSampleMailRequestWithOptions request,
         [FromKeyedServices("MsGraph")] IMailClient client)
     {
         var message = await MakeMessage(request);
+        if (request.FileSize is not null)
+        {
+            FileAttachmentHelper.GenerateAndAddDummyFileAttachmentsToMessage(message, request.FileSize.Value,
+                request.FileAmount ?? 1);
+        }
 
-        await client.SendAsync(message);
-
-        return Ok();
+        try
+        {
+            await client.SendAsync(message);
+            return Ok();
+        }
+        catch (RazorMailMsGraphException e)
+        {
+            return Problem(e.Message);
+        }
     }
 
     [HttpGet]
@@ -59,7 +72,6 @@ public class MailController(
         return Ok();
     }
 
-    //fixme ask sören why async
     [HttpPost]
     public IActionResult StartMsAuthenticationProcess([FromKeyedServices("MsGraph")] IMailClient client)
     {

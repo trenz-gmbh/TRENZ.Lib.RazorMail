@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,9 +6,9 @@ using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Users.Item.Messages.Item.Attachments.CreateUploadSession;
 using Microsoft.Graph.Users.Item.SendMail;
-using Microsoft.VisualBasic;
 
 using TRENZ.Lib.RazorMail.Interfaces;
+using TRENZ.Lib.RazorMail.MicrosoftGraph.Exceptions;
 using TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
 using TRENZ.Lib.RazorMail.MicrosoftGraph.Models;
 using TRENZ.Lib.RazorMail.Models;
@@ -18,8 +17,11 @@ namespace TRENZ.Lib.RazorMail.MicrosoftGraph;
 
 public abstract class MsGraphMailClient : IMailClient
 {
-    private const double MaxSizeAttachmentsMbWithoutUploadSession = 3e6;
-    private const double MaxSizeAttachments = 150e6;
+    //these limits from testing seem somewhat arbitrary
+    //but these are the values given via microsoft:
+    //(09.2026)  https://learn.microsoft.com/en-us/graph/outlook-large-attachments
+    private const double MaxSizeAttachmentsMbWithoutUploadSession = 30e6;
+    private const double MaxSizeAttachment = 150e6;
 
     /// <inheritdoc />
     public MailHeaderCollection DefaultHeaders { get; } = new();
@@ -60,12 +62,13 @@ public abstract class MsGraphMailClient : IMailClient
         if (message.Content.Attachments.Count > 0)
         {
             if (message.Content.Attachments.Values.Any(mailAttachment =>
-                    mailAttachment.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession))
+                    mailAttachment.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession) &&
+                Options.UseUploadSessions)
             {
                 /*
                  * https://learn.microsoft.com/en-us/graph/outlook-large-attachments
                  *
-                 * If under 3 MB we are supposed to add it directly to the message
+                 * If an individual attachment is under 3 MB we are supposed to add it directly to the message
                  * else we need to create an upload session.
                  * It is not clear what exactly 3 MB constitutes for MS therefore we go with SI unit.
                  */
@@ -77,8 +80,9 @@ public abstract class MsGraphMailClient : IMailClient
             return;
         }
 
-        await SendMailDirectly(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems),
-            cancellationToken);
+        await ExecuteGraphApiCall(async () => await SendMailDirectly(fromMail,
+            msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems),
+            cancellationToken));
         LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
     }
 
@@ -90,7 +94,8 @@ public abstract class MsGraphMailClient : IMailClient
             .. message.Content.Attachments.Values.Select(attachment => attachment.ToMsFileAttachment())
         ];
         msMessage.Attachments = msFileAttachments;
-        await SendMailDirectly(fromMail, msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems), cancellationToken);
+        await ExecuteGraphApiCall(async () => await SendMailDirectly(fromMail,
+            msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems), cancellationToken));
         LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
     }
 
@@ -115,12 +120,13 @@ public abstract class MsGraphMailClient : IMailClient
 
             if (contentBytesLength < MaxSizeAttachmentsMbWithoutUploadSession)
             {
-                await AddSmallAttachmentToExistingMessage(fromMail, postedMessage.Id, msFileAttachment.Value,
-                    cancellationToken);
+                await ExecuteGraphApiCall(async () => await AddSmallAttachmentToExistingMessage(fromMail,
+                    postedMessage.Id, msFileAttachment.Value,
+                    cancellationToken));
                 continue;
             }
 
-            if (contentBytesLength > MaxSizeAttachments)
+            if (contentBytesLength > MaxSizeAttachment)
             {
                 LogMailSpecificMessage(
                     $"Skipping attachment with name {msFileAttachment.Value.Name} because its file size exceeds 150 MB",
@@ -132,7 +138,7 @@ public abstract class MsGraphMailClient : IMailClient
                 cancellationToken);
         }
 
-        await SendPostedMessage(fromMail, postedMessage.Id, cancellationToken);
+        await ExecuteGraphApiCall(async () => await SendPostedMessage(fromMail, postedMessage.Id, cancellationToken));
         LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
     }
 
@@ -149,12 +155,55 @@ public abstract class MsGraphMailClient : IMailClient
                 Size = fileSize
             }
         };
-        var uploadSession = await GetUploadSessionForMessage(fromMail, postedMessageId, attachmentUploadRequestBody,
-            cancellationToken);
+        var uploadSession = await ExecuteGraphApiCall(async () => await GetUploadSessionForMessage(fromMail,
+            postedMessageId,
+            attachmentUploadRequestBody,
+            cancellationToken));
         using var stream = new MemoryStream(fileAttachment.ContentBytes);
         var largeFileUploadTask =
             new LargeFileUploadTask<FileAttachment>(uploadSession, stream);
-        await largeFileUploadTask.UploadAsync(cancellationToken: cancellationToken);
+        await ExecuteGraphApiCall(async () =>
+            await largeFileUploadTask.UploadAsync(cancellationToken: cancellationToken));
+    }
+
+    private async Task ExecuteGraphApiCall(Func<Task> asyncApiCall)
+    {
+        try
+        {
+            await asyncApiCall.Invoke();
+        }
+        catch (Exception e)
+        {
+            HandleExceptionDuringApiCall(e);
+        }
+    }
+
+    private void HandleExceptionDuringApiCall(Exception exception)
+    {
+        var message = "A exception occured during a call to the Graph Api:\n";
+        message += exception switch
+        {
+            ServiceException serviceException => serviceException.RawResponseBody,
+            TaskCanceledException taskCanceledException => taskCanceledException.Message,
+            _ => exception.Message
+        };
+
+        Logger.LogError("{message}", message);
+        throw new RazorMailMsGraphException(message);
+    }
+
+    private async Task<T> ExecuteGraphApiCall<T>(Func<Task<T>> asyncApiCall)
+    {
+        try
+        {
+            return await asyncApiCall.Invoke();
+        }
+        catch (Exception e)
+        {
+            HandleExceptionDuringApiCall(e);
+            //unreachable
+            return default;
+        }
     }
 
     private void LogMailSpecificMessage(string message, Message msMessage, string fromMail, LogLevel logLevel)
