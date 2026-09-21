@@ -10,6 +10,7 @@ public static class MailAddressExtensions
     {
         return new EmailAddress
         {
+            Name = address.Name,
             Address = address.Email
         };
     }

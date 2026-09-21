@@ -204,15 +204,19 @@ Example `.json` section:
 }
 ```
 
-In order for the MsGraph portion of this library to be able to work properly, it needs to have proper permissions set for
+In order for the MsGraph portion of this library to be able to work properly, it needs to have permissions set according to
 your chosen mode. MsGraph uses
 the [Microsoft identity platform](https://learn.microsoft.com/en-us/entra/identity-platform/v2-overview) to handle
-authentication. To be able to use this platform, an app registration via
-the [Microsoft Entra Admin center](https://entra.microsoft.com/) is needed. A reference and starting point can be
+authentication. To be able to use this platform and by extension using it in your project that references `TRENZ.Lib.RazorMail.MicrosoftGraph`, it must be registered as an app
+via the [Microsoft Entra Admin center](https://entra.microsoft.com/). A reference and starting point can be
 found [here](https://learn.microsoft.com/en-us/graph/auth/auth-concepts).
 `TenantId` and `ClientId` can be found in that app registration, the `ClientSecret` can be created there as well. Note
 that `SaveToSentItems` which is intended to grant the option of saving a sent mail to the inbox only works if a mail is
-sent without attachments.
+sent without attachments. The options `UseUploadSessions` refers to how attachments shall be handeled.
+Microsoft's documentation implies that for any attachments that are larger than 3 MB an upload session should be created.
+This invlolves saving the mail to the mailbox, attaching the files to it via this upload session and finally sending the mail.
+At the point of writing it is possible to simply use the workflow without upload session for every attachment.
+This allows handling attachments of larger sizes without needing the `Mail.ReadWrite` permission.
 
 ### With Application Permissions
 
