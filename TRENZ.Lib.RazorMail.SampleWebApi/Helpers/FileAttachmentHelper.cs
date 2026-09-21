@@ -4,11 +4,11 @@ namespace TRENZ.Lib.RazorMail.SampleWebApi.Helpers;
 
 public static class FileAttachmentHelper
 {
-    public static void GenerateAndAddDummyFileAttachmentsToMessage(MailMessage message, int fileSize, int fileAmount)
+    public static void GenerateAndAddDummyFileAttachmentsToMessage(MailMessage message, int perFileSizeMb, int fileAmount)
     {
         for (var i = 0; i < fileAmount; i++)
         {
-            var attachment = CreateDummyFile(fileSize, i + 1);
+            var attachment = CreateDummyFile(perFileSizeMb, i + 1);
             message.Content.Attachments.Add(attachment.FileName, attachment);
         }
     }

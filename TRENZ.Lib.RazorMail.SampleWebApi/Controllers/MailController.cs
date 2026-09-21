@@ -21,7 +21,7 @@ public class MailController(
     ///     As such it should match the redirect uri given in the app registration as well as in the app settings.
     /// </summary>
     /// <param name="authcode">the authentication code provided by Microsoft</param>
-    /// <param name="client"> the DelegatedMsGraphMailClient</param>
+    /// <param name="client"> the <see cref="DelegatedMsGraphMailClient" />  </param>
     /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> AuthcodeReceiver([FromQuery(Name = "code")] string authcode,
@@ -39,8 +39,8 @@ public class MailController(
     /// <summary>
     ///     Example endpoint to send mails via MailKit.
     /// </summary>
-    /// <param name="request"> a SendSampleMailRequest</param>
-    /// <param name="client"> the MailKitMailClient</param>
+    /// <param name="request"> a <see cref="SendSampleMailRequest" /> </param>
+    /// <param name="client"> the <see cref="IMailClient" />  </param>
     /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> SendWithMailKit([FromBody] SendSampleMailRequest request,
@@ -56,17 +56,17 @@ public class MailController(
     /// <summary>
     ///     Example endpoint to send mails via MsGraph.
     /// </summary>
-    /// <param name="request"> a SendSampleMailRequestWithOptions</param>
-    /// <param name="client"> a MsGraphMailClient</param>
+    /// <param name="request"> a <see cref="SendSampleMailRequestWithOptions" /></param>
+    /// <param name="client"> the <see cref="IMailClient" />  </param>
     /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> SendWithMsGraph([FromBody] SendSampleMailRequestWithOptions request,
         [FromKeyedServices("MsGraph")] IMailClient client)
     {
         var message = await MakeMessage(request);
-        if (request.FileSize is not null)
+        if (request.PerFileSizeMb is not null)
         {
-            FileAttachmentHelper.GenerateAndAddDummyFileAttachmentsToMessage(message, request.FileSize.Value,
+            FileAttachmentHelper.GenerateAndAddDummyFileAttachmentsToMessage(message, request.PerFileSizeMb.Value,
                 request.FileAmount ?? 1);
         }
 
@@ -94,8 +94,8 @@ public class MailController(
     /// <summary>
     ///     Example endpoint to send mails via SystemNet.
     /// </summary>
-    /// <param name="request"> a SendSampleMailRequest </param>
-    /// <param name="client"> the SystemNetMailClient</param>
+    /// <param name="request"> a <see cref="SendSampleMailRequest" /> </param>
+    /// <param name="client"> the <see cref="IMailClient" />  </param>
     /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> SendWithSystemNet([FromBody] SendSampleMailRequest request,
@@ -113,7 +113,7 @@ public class MailController(
     ///     It should be called (once) to start the Microsoft authentication process.
     ///     This will open a browser.
     /// </summary>
-    /// <param name="client"> the DelegatedMsGraphMailClient</param>
+    /// <param name="client"> the <see cref="DelegatedMsGraphMailClient" />  </param>
     /// <returns></returns>
     [HttpPost]
     public IActionResult StartMsAuthenticationProcess([FromKeyedServices("MsGraph")] IMailClient client)

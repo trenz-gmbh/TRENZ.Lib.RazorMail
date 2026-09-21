@@ -2,6 +2,7 @@
 
 using Azure.Identity;
 
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
@@ -32,14 +33,20 @@ public class DelegatedMsGraphMailClient : MsGraphMailClient
     /// </summary>
     public void CallMsLoginPage()
     {
-        var scopes = new[] { "User.Read", "Mail.ReadWrite", "Mail.Send" };
+        var scopes = new[] { "User.Read", "Mail.ReadWrite", "Mail.Send", "offline_access" };
+
+        QueryBuilder queryBuilder = new();
+        queryBuilder.Add("client_id", Options.ClientId);
+        queryBuilder.Add("client_secret", Options.ClientSecret);
+        queryBuilder.Add("redirect_uri",  Options.RedirectUri);
+        queryBuilder.Add("scope", string.Join(" ", scopes));
+        queryBuilder.Add("response_type", "code");
+        queryBuilder.Add("response_mode", "query");
 
         var uriBuilder = new UriBuilder(
             $"https://login.microsoftonline.com/{Options.TenantId}/oauth2/v2.0/authorize")
         {
-            Query = string.Join("&", $"client_id={Options.ClientId}", "response_type=code",
-                $"redirect_uri={Options.RedirectUri}", "response_mode=query",
-                $"scope={"offline_access " + string.Join(" ", scopes)}")
+            Query = queryBuilder.ToString()
         };
 
         Process.Start(new ProcessStartInfo

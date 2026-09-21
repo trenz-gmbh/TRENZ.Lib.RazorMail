@@ -32,7 +32,7 @@ public record MsGraphOptions
     ///     or if all present attachments are under 3MB.
     ///     If any attachment is over 3MB the message needs to created beforehand to upload the attachment to it.
     ///     At that stage the api currently has no option to not save it to sent items.
-    ///     If the option UseUploadSession is set to false this option would work with attachment sizes greater than 3MB.
+    ///     If the option <see cref="UseUploadSessions"/> is set to false this option would work with attachment sizes greater than 3MB.
     /// </summary>
     public required bool SaveToSentItems { get; init; }
 
@@ -44,7 +44,7 @@ public record MsGraphOptions
 
     /// <summary>
     ///     This gives the option to always upload attachments directly to the mail, regardless of size.
-    ///     This is not the way Microsoft recommends handling attachments.
+    ///     Disabling this is not recommended.
     /// </summary>
     public required bool UseUploadSessions { get; init; }
 }
