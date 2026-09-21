@@ -15,11 +15,19 @@ public class MailController(
 )
     : ControllerBase
 {
+    /// <summary>
+    ///     This endpoint is relevant for the use of MsGraph with delegated permissions.
+    ///     It should be called as a redirect during the Microsoft authentication process.
+    ///     As such it should match the redirect uri given in the app registration as well as in the app settings.
+    /// </summary>
+    /// <param name="authcode">the authentication code provided by Microsoft</param>
+    /// <param name="client"> the DelegatedMsGraphMailClient</param>
+    /// <returns></returns>
     [HttpGet]
     public async Task<IActionResult> AuthcodeReceiver([FromQuery(Name = "code")] string authcode,
         [FromKeyedServices("MsGraph")] IMailClient client)
     {
-        if (client is not MsGraphDelegatedMailClient mailClient)
+        if (client is not DelegatedMsGraphMailClient mailClient)
         {
             return BadRequest("RazorMail MsGraph is not in delegated mode");
         }
@@ -28,6 +36,12 @@ public class MailController(
         return Ok();
     }
 
+    /// <summary>
+    ///     Example endpoint to send mails via MailKit.
+    /// </summary>
+    /// <param name="request"> a SendSampleMailRequest</param>
+    /// <param name="client"> the MailKitMailClient</param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> SendWithMailKit([FromBody] SendSampleMailRequest request,
         [FromKeyedServices("MailKit")] IMailClient client)
@@ -39,6 +53,12 @@ public class MailController(
         return Ok();
     }
 
+    /// <summary>
+    ///     Example endpoint to send mails via MsGraph.
+    /// </summary>
+    /// <param name="request"> a SendSampleMailRequestWithOptions</param>
+    /// <param name="client"> a MsGraphMailClient</param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> SendWithMsGraph([FromBody] SendSampleMailRequestWithOptions request,
         [FromKeyedServices("MsGraph")] IMailClient client)
@@ -71,6 +91,12 @@ public class MailController(
         }
     }
 
+    /// <summary>
+    ///     Example endpoint to send mails via SystemNet.
+    /// </summary>
+    /// <param name="request"> a SendSampleMailRequest </param>
+    /// <param name="client"> the SystemNetMailClient</param>
+    /// <returns></returns>
     [HttpPost]
     public async Task<IActionResult> SendWithSystemNet([FromBody] SendSampleMailRequest request,
         [FromKeyedServices("System.Net.Mail")] IMailClient client)
@@ -82,10 +108,17 @@ public class MailController(
         return Ok();
     }
 
+    /// <summary>
+    ///     This endpoint is relevant for the use of MsGraph with delegated permissions.
+    ///     It should be called (once) to start the Microsoft authentication process.
+    ///     This will open a browser.
+    /// </summary>
+    /// <param name="client"> the DelegatedMsGraphMailClient</param>
+    /// <returns></returns>
     [HttpPost]
     public IActionResult StartMsAuthenticationProcess([FromKeyedServices("MsGraph")] IMailClient client)
     {
-        if (client is not MsGraphDelegatedMailClient mailClient)
+        if (client is not DelegatedMsGraphMailClient mailClient)
         {
             return BadRequest("RazorMail MsGraph is not in delegated mode");
         }

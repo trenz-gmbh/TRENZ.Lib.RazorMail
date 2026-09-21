@@ -26,11 +26,11 @@ public static class ServiceCollectionExtensions
         MsGraphMailClient msGraphMailClient;
         if (azureAdOptions.Value.IsDelegated)
         {
-            msGraphMailClient = new MsGraphDelegatedMailClient(azureAdOptions, msGraphMailLogger);
+            msGraphMailClient = new DelegatedMsGraphMailClient(azureAdOptions, msGraphMailLogger);
         }
         else
         {
-            msGraphMailClient = new MsGraphApplicationMailClient(azureAdOptions, msGraphMailLogger);
+            msGraphMailClient = new DefaultMsGraphMailClient(azureAdOptions, msGraphMailLogger);
         }
 
         configureClient?.Invoke(serviceProvider, msGraphMailClient);

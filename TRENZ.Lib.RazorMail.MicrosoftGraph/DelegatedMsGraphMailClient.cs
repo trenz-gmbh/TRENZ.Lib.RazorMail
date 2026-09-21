@@ -16,11 +16,11 @@ using Process = System.Diagnostics.Process;
 
 namespace TRENZ.Lib.RazorMail.MicrosoftGraph;
 
-public class MsGraphDelegatedMailClient : MsGraphMailClient
+public class DelegatedMsGraphMailClient : MsGraphMailClient
 {
     private User? _user;
 
-    internal MsGraphDelegatedMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
+    internal DelegatedMsGraphMailClient(IOptions<MsGraphOptions> accountOptions, ILogger<MsGraphMailClient> logger) :
         base(accountOptions, logger)
     {
     }
