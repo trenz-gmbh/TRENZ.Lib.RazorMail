@@ -19,7 +19,7 @@ public static class MailAddressExtensions
     {
         return
         [
-            .. addresses.Select(mailAdress => new Recipient()
+            .. addresses.Select(mailAdress => new Recipient
             {
                 EmailAddress = mailAdress.ToMsEmailAddress()
             })

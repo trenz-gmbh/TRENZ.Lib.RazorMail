@@ -43,60 +43,60 @@ public abstract class MsGraphMailClient : IMailClient
         await SendInternalAsync(message, cancellationToken);
     }
 
-    private async Task SendInternalAsync(MailMessage message, CancellationToken cancellationToken = default)
+    protected abstract Task AddSmallAttachmentToExistingMessage(string fromMail, string messageId,
+        FileAttachment fileAttachment,
+        CancellationToken cancellationToken);
+
+    protected abstract Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
+        CreateUploadSessionPostRequestBody requestBody,
+        CancellationToken cancellationToken);
+
+    protected abstract Task<Message?>
+        PostMessageToInbox(string fromMail, Message message, CancellationToken cancellationToken);
+
+    protected abstract Task SendMailDirectly(string fromMail, SendMailPostRequestBody sendMailPostRequestBody,
+        CancellationToken cancellationToken);
+
+    protected abstract Task SendPostedMessage(string fromMail, string messageId, CancellationToken cancellationToken);
+
+    private async Task ExecuteGraphApiCall(Func<Task> asyncApiCall)
     {
-        if (GraphServiceClient is null)
+        try
         {
-            Logger.LogWarning("A mail was attempted to be sent but there is no GraphServiceClient initialized");
-            return;
+            await asyncApiCall.Invoke();
         }
-
-        if (message.Headers.From is null)
+        catch (Exception e)
         {
-            Logger.LogWarning("Sending mail was not possible since the message has no sender defined");
-            return;
+            HandleExceptionDuringApiCall(e);
         }
-
-        var fromMail = message.Headers.From.Email;
-        var msMessage = message.ToMsMessage();
-        if (message.Content.Attachments.Count > 0)
-        {
-            if (message.Content.Attachments.Values.Any(mailAttachment =>
-                    mailAttachment.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession) &&
-                Options.UseUploadSessions)
-            {
-                /*
-                 * https://learn.microsoft.com/en-us/graph/outlook-large-attachments
-                 *
-                 * If an individual attachment is under 3 MB we are supposed to add it directly to the message
-                 * else we need to create an upload session.
-                 * It is not clear what exactly 3 MB constitutes for MS therefore we go with SI unit.
-                 */
-                await HandleMessageWithLargerAttachments(msMessage, message, fromMail, cancellationToken);
-                return;
-            }
-
-            await HandleMessageWithOnlySmallAttachments(msMessage, message, fromMail, cancellationToken);
-            return;
-        }
-
-        await ExecuteGraphApiCall(async () => await SendMailDirectly(fromMail,
-            msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems),
-            cancellationToken));
-        LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
     }
 
-    private async Task HandleMessageWithOnlySmallAttachments(Message msMessage, MailMessage message, string fromMail,
-        CancellationToken cancellationToken)
+    private async Task<T> ExecuteGraphApiCall<T>(Func<Task<T>> asyncApiCall)
     {
-        List<Attachment> msFileAttachments =
-        [
-            .. message.Content.Attachments.Values.Select(attachment => attachment.ToMsFileAttachment())
-        ];
-        msMessage.Attachments = msFileAttachments;
-        await ExecuteGraphApiCall(async () => await SendMailDirectly(fromMail,
-            msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems), cancellationToken));
-        LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
+        try
+        {
+            return await asyncApiCall.Invoke();
+        }
+        catch (Exception e)
+        {
+            HandleExceptionDuringApiCall(e);
+            //unreachable
+            return default;
+        }
+    }
+
+    private void HandleExceptionDuringApiCall(Exception exception)
+    {
+        var message = "A exception occured during a call to the Graph Api:\n";
+        message += exception switch
+        {
+            ServiceException serviceException => serviceException.RawResponseBody,
+            TaskCanceledException taskCanceledException => taskCanceledException.Message,
+            _ => exception.Message
+        };
+
+        Logger.LogError("{message}", message);
+        throw new RazorMailMsGraphException(message);
     }
 
     private async Task HandleMessageWithLargerAttachments(Message msMessage, MailMessage message, string fromMail,
@@ -142,6 +142,75 @@ public abstract class MsGraphMailClient : IMailClient
         LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
     }
 
+    private async Task HandleMessageWithOnlySmallAttachments(Message msMessage, MailMessage message, string fromMail,
+        CancellationToken cancellationToken)
+    {
+        List<Attachment> msFileAttachments =
+        [
+            .. message.Content.Attachments.Values.Select(attachment => attachment.ToMsFileAttachment())
+        ];
+        msMessage.Attachments = msFileAttachments;
+        await ExecuteGraphApiCall(async () => await SendMailDirectly(fromMail,
+            msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems), cancellationToken));
+        LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
+    }
+
+    private void LogMailSpecificMessage(string message, Message msMessage, string fromMail, LogLevel logLevel)
+    {
+        var recipients = string.Join(" , ",
+            msMessage.ToRecipients!.Select(recipient => recipient.EmailAddress!.Address));
+        var ccRecipients = string.Join(" , ",
+            msMessage.CcRecipients!.Select(recipient => recipient.EmailAddress!.Address));
+        var bccRecipients = string.Join(" , ",
+            msMessage.BccRecipients!.Select(recipient => recipient.EmailAddress!.Address));
+        var messageSuffix =
+            $"For mail from {fromMail} to {recipients} (CC: {ccRecipients}, BCC: {bccRecipients}) with subject: \"{msMessage.Subject}\"";
+        Logger.Log(logLevel, "{message}\n{messageSuffix}", message, messageSuffix);
+    }
+
+    private async Task SendInternalAsync(MailMessage message, CancellationToken cancellationToken = default)
+    {
+        if (GraphServiceClient is null)
+        {
+            Logger.LogWarning("A mail was attempted to be sent but there is no GraphServiceClient initialized");
+            return;
+        }
+
+        if (message.Headers.From is null)
+        {
+            Logger.LogWarning("Sending mail was not possible since the message has no sender defined");
+            return;
+        }
+
+        var fromMail = message.Headers.From.Email;
+        var msMessage = message.ToMsMessage();
+        if (message.Content.Attachments.Count > 0)
+        {
+            if (message.Content.Attachments.Values.Any(mailAttachment =>
+                    mailAttachment.FileData.Length > MaxSizeAttachmentsMbWithoutUploadSession) &&
+                Options.UseUploadSessions)
+            {
+                /*
+                 * https://learn.microsoft.com/en-us/graph/outlook-large-attachments
+                 *
+                 * If an individual attachment is under 3 MB we are supposed to add it directly to the message
+                 * else we need to create an upload session.
+                 * It is not clear what exactly 3 MB constitutes for MS therefore we go with SI unit.
+                 */
+                await HandleMessageWithLargerAttachments(msMessage, message, fromMail, cancellationToken);
+                return;
+            }
+
+            await HandleMessageWithOnlySmallAttachments(msMessage, message, fromMail, cancellationToken);
+            return;
+        }
+
+        await ExecuteGraphApiCall(async () => await SendMailDirectly(fromMail,
+            msMessage.ToMsMailPostRequestBody(Options.SaveToSentItems),
+            cancellationToken));
+        LogMailSpecificMessage("Mail successfully sent", msMessage, fromMail, LogLevel.Information);
+    }
+
     private async Task UploadLargerAttachmentViaSession(string fromMail, string postedMessageId,
         FileAttachment fileAttachment, CancellationToken cancellationToken)
     {
@@ -165,73 +234,4 @@ public abstract class MsGraphMailClient : IMailClient
         await ExecuteGraphApiCall(async () =>
             await largeFileUploadTask.UploadAsync(cancellationToken: cancellationToken));
     }
-
-    private async Task ExecuteGraphApiCall(Func<Task> asyncApiCall)
-    {
-        try
-        {
-            await asyncApiCall.Invoke();
-        }
-        catch (Exception e)
-        {
-            HandleExceptionDuringApiCall(e);
-        }
-    }
-
-    private void HandleExceptionDuringApiCall(Exception exception)
-    {
-        var message = "A exception occured during a call to the Graph Api:\n";
-        message += exception switch
-        {
-            ServiceException serviceException => serviceException.RawResponseBody,
-            TaskCanceledException taskCanceledException => taskCanceledException.Message,
-            _ => exception.Message
-        };
-
-        Logger.LogError("{message}", message);
-        throw new RazorMailMsGraphException(message);
-    }
-
-    private async Task<T> ExecuteGraphApiCall<T>(Func<Task<T>> asyncApiCall)
-    {
-        try
-        {
-            return await asyncApiCall.Invoke();
-        }
-        catch (Exception e)
-        {
-            HandleExceptionDuringApiCall(e);
-            //unreachable
-            return default;
-        }
-    }
-
-    private void LogMailSpecificMessage(string message, Message msMessage, string fromMail, LogLevel logLevel)
-    {
-        var recipients = string.Join(" , ",
-            msMessage.ToRecipients!.Select(recipient => recipient.EmailAddress!.Address));
-        var ccRecipients = string.Join(" , ",
-            msMessage.CcRecipients!.Select(recipient => recipient.EmailAddress!.Address));
-        var bccRecipients = string.Join(" , ",
-            msMessage.BccRecipients!.Select(recipient => recipient.EmailAddress!.Address));
-        var messageSuffix =
-            $"For mail from {fromMail} to {recipients} (CC: {ccRecipients}, BCC: {bccRecipients}) with subject: \"{msMessage.Subject}\"";
-        Logger.Log(logLevel, "{message}\n{messageSuffix}", message, messageSuffix);
-    }
-
-    protected abstract Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
-        CreateUploadSessionPostRequestBody requestBody,
-        CancellationToken cancellationToken);
-
-    protected abstract Task<Message?>
-        PostMessageToInbox(string fromMail, Message message, CancellationToken cancellationToken);
-
-    protected abstract Task SendPostedMessage(string fromMail, string messageId, CancellationToken cancellationToken);
-
-    protected abstract Task AddSmallAttachmentToExistingMessage(string fromMail, string messageId,
-        FileAttachment fileAttachment,
-        CancellationToken cancellationToken);
-
-    protected abstract Task SendMailDirectly(string fromMail, SendMailPostRequestBody sendMailPostRequestBody,
-        CancellationToken cancellationToken);
 }

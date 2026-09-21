@@ -7,6 +7,16 @@ namespace TRENZ.Lib.RazorMail.MicrosoftGraph.Extensions;
 
 public static class MailMessageExtensions
 {
+    public static SendMailPostRequestBody ToMsMailPostRequestBody(this Message message,
+        bool saveToSentItems = false)
+    {
+        return new SendMailPostRequestBody
+        {
+            Message = message,
+            SaveToSentItems = saveToSentItems
+        };
+    }
+
     public static Message ToMsMessage(this MailMessage message)
     {
         var messageContent = message.Content;
@@ -32,17 +42,4 @@ public static class MailMessageExtensions
                              new Dictionary<string, object>()
         };
     }
-
-    public static SendMailPostRequestBody ToMsMailPostRequestBody(this Message message,
-        bool saveToSentItems = false)
-    {
-        return new SendMailPostRequestBody
-        {
-            Message = message,
-            SaveToSentItems = saveToSentItems
-        };
-    }
-
-
-
 }

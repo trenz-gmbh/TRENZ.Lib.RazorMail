@@ -19,19 +19,12 @@ public class MsGraphApplicationMailClient : MsGraphMailClient
         InitializeGraphClient();
     }
 
-    private void InitializeGraphClient()
+    protected override async Task AddSmallAttachmentToExistingMessage(string fromMail, string messageId,
+        FileAttachment fileAttachment,
+        CancellationToken cancellationToken)
     {
-        var tenantId = Options.TenantId;
-        var clientId = Options.ClientId;
-        var clientSecret = Options.ClientSecret;
-
-        var options = new ClientSecretCredentialOptions
-        {
-            AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
-        };
-        var clientSecretCredential = new ClientSecretCredential(
-            tenantId, clientId, clientSecret, options);
-        GraphServiceClient = new GraphServiceClient(clientSecretCredential);
+        await GraphServiceClient!.Users[fromMail].Messages[messageId].Attachments
+            .PostAsync(fileAttachment, cancellationToken: cancellationToken);
     }
 
     protected override async Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
@@ -49,6 +42,14 @@ public class MsGraphApplicationMailClient : MsGraphMailClient
             .PostAsync(message, cancellationToken: cancellationToken);
     }
 
+    protected override async Task SendMailDirectly(string fromMail,
+        SendMailPostRequestBody sendMailPostRequestBody,
+        CancellationToken cancellationToken)
+    {
+        await GraphServiceClient!.Users[fromMail].SendMail
+            .PostAsync(sendMailPostRequestBody, cancellationToken: cancellationToken);
+    }
+
     protected override async Task SendPostedMessage(string fromMail, string messageId,
         CancellationToken cancellationToken)
     {
@@ -56,19 +57,18 @@ public class MsGraphApplicationMailClient : MsGraphMailClient
             .PostAsync(cancellationToken: cancellationToken);
     }
 
-    protected override async Task AddSmallAttachmentToExistingMessage(string fromMail, string messageId,
-        FileAttachment fileAttachment,
-        CancellationToken cancellationToken)
+    private void InitializeGraphClient()
     {
-        await GraphServiceClient!.Users[fromMail].Messages[messageId].Attachments
-            .PostAsync(fileAttachment, cancellationToken: cancellationToken);
-    }
+        var tenantId = Options.TenantId;
+        var clientId = Options.ClientId;
+        var clientSecret = Options.ClientSecret;
 
-    protected override async Task SendMailDirectly(string fromMail,
-        SendMailPostRequestBody sendMailPostRequestBody,
-        CancellationToken cancellationToken)
-    {
-        await GraphServiceClient!.Users[fromMail].SendMail
-            .PostAsync(sendMailPostRequestBody, cancellationToken: cancellationToken);
+        var options = new ClientSecretCredentialOptions
+        {
+            AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+        };
+        var clientSecretCredential = new ClientSecretCredential(
+            tenantId, clientId, clientSecret, options);
+        GraphServiceClient = new GraphServiceClient(clientSecretCredential);
     }
 }

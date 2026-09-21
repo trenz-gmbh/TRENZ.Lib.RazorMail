@@ -26,6 +26,30 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
     }
 
     /// <summary>
+    ///     Method which calls the microsoft login flow.
+    ///     This will be attempted to be opened in a browser.
+    ///     See https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow for more details.
+    /// </summary>
+    public void CallMsLoginPage()
+    {
+        var scopes = new[] { "User.Read", "Mail.ReadWrite", "Mail.Send" };
+
+        var uriBuilder = new UriBuilder(
+            $"https://login.microsoftonline.com/{Options.TenantId}/oauth2/v2.0/authorize")
+        {
+            Query = string.Join("&", $"client_id={Options.ClientId}", "response_type=code",
+                $"redirect_uri={Options.RedirectUri}", "response_mode=query",
+                $"scope={"offline_access " + string.Join(" ", scopes)}")
+        };
+
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = uriBuilder.ToString(),
+            UseShellExecute = true
+        });
+    }
+
+    /// <summary>
     ///     Method to initialize the graph client used to interact with the Ms Graph API.
     ///     This Method is intended to be called by the redirect point of your application specified in the
     ///     appsettings as well as in entra id.
@@ -74,28 +98,13 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         Logger.LogInformation("Delegated GrapService started for user: {name}", _user.DisplayName);
     }
 
-    /// <summary>
-    ///     Method which calls the microsoft login flow.
-    ///     This will be attempted to be opened in a browser.
-    ///     See https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow for more details.
-    /// </summary>
-    public void CallMsLoginPage()
+    protected override async Task AddSmallAttachmentToExistingMessage(string fromMail, string messageId,
+        FileAttachment fileAttachment,
+        CancellationToken cancellationToken)
     {
-        var scopes = new[] { "User.Read", "Mail.ReadWrite", "Mail.Send" };
-
-        var uriBuilder = new UriBuilder(
-            $"https://login.microsoftonline.com/{Options.TenantId}/oauth2/v2.0/authorize")
-        {
-            Query = string.Join("&", $"client_id={Options.ClientId}", "response_type=code",
-                $"redirect_uri={Options.RedirectUri}", "response_mode=query",
-                $"scope={"offline_access " + string.Join(" ", scopes)}")
-        };
-
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = uriBuilder.ToString(),
-            UseShellExecute = true
-        });
+        EnsureFromMailIsUserMail(fromMail);
+        await GraphServiceClient!.Me.Messages[messageId].Attachments
+            .PostAsync(fileAttachment, cancellationToken: cancellationToken);
     }
 
     protected override async Task<UploadSession?> GetUploadSessionForMessage(string fromMail, string postedMessageId,
@@ -103,12 +112,11 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         CancellationToken cancellationToken)
     {
         EnsureFromMailIsUserMail(fromMail);
-        Microsoft.Graph.Me.Messages.Item.Attachments.CreateUploadSession.CreateUploadSessionPostRequestBody
-            request =
-                new()
-                {
-                    AttachmentItem = requestBody.AttachmentItem
-                };
+        var request =
+            new Microsoft.Graph.Me.Messages.Item.Attachments.CreateUploadSession.CreateUploadSessionPostRequestBody
+            {
+                AttachmentItem = requestBody.AttachmentItem
+            };
         return await GraphServiceClient!.Me.Messages[postedMessageId].Attachments
             .CreateUploadSession.PostAsync(request, cancellationToken: cancellationToken);
     }
@@ -119,23 +127,6 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         EnsureFromMailIsUserMail(fromMail);
         return await GraphServiceClient!.Me.Messages
             .PostAsync(message, cancellationToken: cancellationToken);
-    }
-
-    protected override async Task SendPostedMessage(string fromMail, string messageId,
-        CancellationToken cancellationToken)
-    {
-        EnsureFromMailIsUserMail(fromMail);
-        await GraphServiceClient!.Me.Messages[messageId].Send
-            .PostAsync(cancellationToken: cancellationToken);
-    }
-
-    protected override async Task AddSmallAttachmentToExistingMessage(string fromMail, string messageId,
-        FileAttachment fileAttachment,
-        CancellationToken cancellationToken)
-    {
-        EnsureFromMailIsUserMail(fromMail);
-        await GraphServiceClient!.Me.Messages[messageId].Attachments
-            .PostAsync(fileAttachment, cancellationToken: cancellationToken);
     }
 
     protected override async Task SendMailDirectly(string fromMail,
@@ -149,6 +140,14 @@ public class MsGraphDelegatedMailClient : MsGraphMailClient
         };
         await GraphServiceClient!.Me.SendMail
             .PostAsync(requestBody, cancellationToken: cancellationToken);
+    }
+
+    protected override async Task SendPostedMessage(string fromMail, string messageId,
+        CancellationToken cancellationToken)
+    {
+        EnsureFromMailIsUserMail(fromMail);
+        await GraphServiceClient!.Me.Messages[messageId].Send
+            .PostAsync(cancellationToken: cancellationToken);
     }
 
     private void EnsureFromMailIsUserMail(string fromMail)

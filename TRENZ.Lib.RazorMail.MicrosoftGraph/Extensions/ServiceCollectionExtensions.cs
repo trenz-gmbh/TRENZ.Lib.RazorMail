@@ -18,6 +18,25 @@ public static class ServiceCollectionExtensions
         return services.InternalAddMsGraphMailClient(configureClient, serviceKey);
     }
 
+    private static MsGraphMailClient CreateMsGraphService(IServiceProvider serviceProvider,
+        Action<IServiceProvider, MsGraphMailClient>? configureClient)
+    {
+        var azureAdOptions = serviceProvider.GetRequiredService<IOptions<MsGraphOptions>>();
+        var msGraphMailLogger = serviceProvider.GetRequiredService<ILogger<MsGraphMailClient>>();
+        MsGraphMailClient msGraphMailClient;
+        if (azureAdOptions.Value.IsDelegated)
+        {
+            msGraphMailClient = new MsGraphDelegatedMailClient(azureAdOptions, msGraphMailLogger);
+        }
+        else
+        {
+            msGraphMailClient = new MsGraphApplicationMailClient(azureAdOptions, msGraphMailLogger);
+        }
+
+        configureClient?.Invoke(serviceProvider, msGraphMailClient);
+        return msGraphMailClient;
+    }
+
     private static IServiceCollection InternalAddMsGraphMailClient(
         this IServiceCollection services,
         Action<IServiceProvider, MsGraphMailClient>? configureClient = null,
@@ -38,24 +57,5 @@ public static class ServiceCollectionExtensions
         }
 
         return services;
-    }
-
-    private static MsGraphMailClient CreateMsGraphService(IServiceProvider serviceProvider,
-        Action<IServiceProvider, MsGraphMailClient>? configureClient)
-    {
-        var azureAdOptions = serviceProvider.GetRequiredService<IOptions<MsGraphOptions>>();
-        var msGraphMailLogger = serviceProvider.GetRequiredService<ILogger<MsGraphMailClient>>();
-        MsGraphMailClient msGraphMailClient;
-        if (azureAdOptions.Value.IsDelegated)
-        {
-            msGraphMailClient = new MsGraphDelegatedMailClient(azureAdOptions, msGraphMailLogger);
-        }
-        else
-        {
-            msGraphMailClient = new MsGraphApplicationMailClient(azureAdOptions, msGraphMailLogger);
-        }
-
-        configureClient?.Invoke(serviceProvider, msGraphMailClient);
-        return msGraphMailClient;
     }
 }
