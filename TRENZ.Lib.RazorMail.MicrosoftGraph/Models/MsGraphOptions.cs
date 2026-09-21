@@ -17,6 +17,7 @@ public record MsGraphOptions
     /// <summary>
     ///     This value decides if a mail client which assumes application level permissions or one which assumes delegated
     ///     permissions shall be created.
+    ///     This should match the permissions set in the entra app registration.
     /// </summary>
     public required bool IsDelegated { get; init; }
 
@@ -31,6 +32,7 @@ public record MsGraphOptions
     ///     or if all present attachments are under 3MB.
     ///     If any attachment is over 3MB the message needs to created beforehand to upload the attachment to it.
     ///     At that stage the api currently has no option to not save it to sent items.
+    ///     If the option UseUploadSession is set to false this option would work with attachment sizes greater than 3MB.
     /// </summary>
     public required bool SaveToSentItems { get; init; }
 
@@ -41,9 +43,8 @@ public record MsGraphOptions
     public required string TenantId { get; init; }
 
     /// <summary>
-    ///     This gives the option to not use the way Microsoft recommends and simply attempt to always attach attachments
-    ///     directly to the mail.
-    ///     Regardless of size.
+    ///     This gives the option to always upload attachments directly to the mail, regardless of size.
+    ///     This is not the way Microsoft recommends handling attachments.
     /// </summary>
     public required bool UseUploadSessions { get; init; }
 }
