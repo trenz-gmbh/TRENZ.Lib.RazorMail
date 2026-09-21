@@ -1,3 +1,7 @@
+# 2.4.0
+
+- Added support for the Microsoft Graph API
+
 # 2.3.1
 
 - Security: Updated `MailKit` to 4.15.1
