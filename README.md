@@ -2,6 +2,7 @@
 ![Core NuGet Version](https://img.shields.io/nuget/v/TRENZ.Lib.RazorMail.Core?style=flat-square&label=Core)
 ![MailKit NuGet Version](https://img.shields.io/nuget/v/TRENZ.Lib.RazorMail.MailKit?style=flat-square&label=MailKit)
 ![SystemNet NuGet Version](https://img.shields.io/nuget/v/TRENZ.Lib.RazorMail.SystemNet?style=flat-square&label=SystemNet)
+![MsGraph NuGet Version](https://img.shields.io/nuget/v/TRENZ.Lib.RazorMail.SystemNet?style=flat-square&label=Microsoft%20Graph%20API)
 ![NuGet Downloads](https://img.shields.io/nuget/dt/TRENZ.Lib.RazorMail.Core?style=flat-square)
 
 # TRENZ.Lib.RazorMail
