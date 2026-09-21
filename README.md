@@ -5,10 +5,12 @@
 ![NuGet Downloads](https://img.shields.io/nuget/dt/TRENZ.Lib.RazorMail.Core?style=flat-square)
 
 # TRENZ.Lib.RazorMail
+
 ## Templated transactional e-mail using Razor
 
-This is a simple library you can use to write e-mail templates in [Razor syntax](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/razor). That means you write raw HTML,
-but elevated with C# — you get `@foreach`, `@switch`, and so on, _and_ you get a strongly-typed model for custom data.
+This is a simple library you can use to write e-mail templates
+in [Razor syntax](https://learn.microsoft.com/en-us/aspnet/core/mvc/views/razor). That means you write raw HTML, but
+elevated with C# — you get `@foreach`, `@switch`, and so on, _and_ you get a strongly-typed model for custom data.
 
 ## Installation
 
@@ -16,20 +18,35 @@ but elevated with C# — you get `@foreach`, `@switch`, and so on, _and_ you get
 > You currently need to create an ASP.NET app to use the razor mail renderer.
 > See [#7](https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail/issues/7) for more information.
 
-In NuGet, reference either the `TRENZ.Lib.RazorMail.SystemNet` or the `TRENZ.Lib.RazorMail.MailKit` package, depending
-on which `MailSender` backend you prefer. [MailKit](https://github.com/jstedfast/MailKit) is more modern and powerful,
-but `System.Net.Mail` comes built into .NET. There is no need to reference `TRENZ.Lib.RazorMail` directly.
+In NuGet, reference one of the available packages, depending on which `MailSender` backend you prefer. Currently, there
+are three available:
+
+* `System.Net.Mail` comes built into .NET and can be referenced via `TRENZ.Lib.RazorMail.SystemNet`
+* [MailKit](https://github.com/jstedfast/MailKit) is more modern and powerful than `System.Net.Mail` and can be referenced via
+  `TRENZ.Lib.RazorMail.MailKit`
+* Using the [Microsoft Graph API](https://learn.microsoft.com/en-us/graph/overview) it is possible to send Mails via
+  the Microsoft 365 / Outlook.com service without using SMTP. It can be referenced via `TRENZ.Lib.RazorMail.MicrosoftGraph`.
+
+There is no need to reference `TRENZ.Lib.RazorMail.Core` directly.
 
 Via dotnet:
+
+Using `System.Net.Mail`
 
 ```bash
 dotnet add package TRENZ.Lib.RazorMail.SystemNet
 ```
 
-…or:
+Using MailKit
 
 ```bash
 dotnet add package TRENZ.Lib.RazorMail.MailKit
+```
+
+Using Microsoft Graph
+
+```bash
+dotnet add package TRENZ.Lib.RazorMail.MicrosoftGraph
 ```
 
 ## Usage
@@ -47,6 +64,8 @@ builder.Services.AddRazorMailRenderer();
 builder.Services.AddMailKitMailClient();
 // or
 builder.Services.AddSystemNetMailClient();
+// or
+builder.Services.AddMsGraphMailClient();
 
 var app = builder.Build();
 
@@ -86,7 +105,8 @@ public record SampleModel(string Salutation);
 
 Notice that:
 
-* we're passing `SampleModel` as our model type. It has a property `Salutation`, so we can then do `@Model.Salutation` to get its value.
+* we're passing `SampleModel` as our model type. It has a property `Salutation`, so we can then do `@Model.Salutation`
+  to get its value.
 * we can set the `Subject` property, which becomes the e-mail subject.
 
 ## Attachments
@@ -100,13 +120,12 @@ For example, to show an image inline, you simply do:
 <img src="@InlineFile("My Company Logo.png")" />
 ```
 
-That's it. This attaches the image as a file, then references it using `cid` format[^1].
-Because the image is attached, this also doesn't require your users to enable
-loading external images, which some mail clients restricts for privacy reasons.
+That's it. This attaches the image as a file, then references it using `cid` format[^1]. Because the image is attached,
+this also doesn't require your users to enable loading external images, which some mail clients restrict for privacy
+reasons.
 
 [^1]: Each attachment becomes part of a [MIME multipart message](https://en.wikipedia.org/wiki/MIME#Multipart_messages),
-and is identified by its Content-ID. To _refer_ to that part, RazorMail then
-uses the `cid:(Content-ID)` URI scheme.
+and is identified by its Content-ID. To _refer_ to that part, RazorMail then uses the `cid:(Content-ID)` URI scheme.
 
 Or, to attach a file:
 
@@ -123,7 +142,8 @@ Or, to attach a file:
 Depending on which NuGet package you've picked above, you get a backend for sending either via the classic
 `System.Net.Mail`, or via `MailKit`/MimeKit.
 
-You can also pass a callback to the mail clients to configure default headers (setting a global `From` header, for example).
+You can also pass a callback to the mail clients to configure default headers (setting a global `From` header, for
+example).
 
 > [!NOTE]
 > The `IMailRenderer` is a scoped service.
@@ -162,3 +182,58 @@ var mail = new MailMessage
 IMailClient client = ...; // inject via DI or use MailKitMailClient or SystemNetMailClient directly
 await client.SendAsync(mail);
 ```
+
+## Microsoft Graph Considerations
+
+The Microsoft Graph API (MsGraph) is a powerful API provided by Microsoft. There are currently two modes in which this
+library can be used with MsGraph. It is able to send mails either on behalf of user (delegated) or as every user in a
+tenant (application). Configuration of the MsGraph portion of this library is done via the `appsettings.json` file.
+Example `.json` section:
+
+```json
+{
+  "MsGraphOptions": {
+    "TenantId": "your_tenant_id",
+    "ClientId": "your_client_id",
+    "ClientSecret": "your_secret",
+    "SaveToSentItems": false,
+    "RedirectUri": "your_redirect_id",
+    "Delegated": true,
+    "UseUploadSessions": true
+  }
+}
+```
+
+In order for the MsGraph portion of this library to be able to work properly, it needs to have permissions set according to
+your chosen mode. MsGraph uses
+the [Microsoft identity platform](https://learn.microsoft.com/en-us/entra/identity-platform/v2-overview) to handle
+authentication. To be able to use this platform and by extension use it in your project that references `TRENZ.Lib.RazorMail.MicrosoftGraph`, it must be registered as an app
+via the [Microsoft Entra Admin center](https://entra.microsoft.com/). A reference and starting point can be
+found [here](https://learn.microsoft.com/en-us/graph/auth/auth-concepts).
+`TenantId` and `ClientId` can be found in that app registration, the `ClientSecret` can be created there as well. Note
+that `SaveToSentItems` which is intended to grant the option of saving a sent mail to the inbox only works if a mail is
+sent without attachments. The option `UseUploadSessions` refers to how attachments shall be handled.
+Microsoft's documentation implies that for any attachments that are larger than 3 MB an upload session should be created.
+This invlolves saving the mail to the mailbox, attaching the files to it via this upload session and finally sending the mail.
+At the point of writing it is possible to simply use the workflow without upload session for every attachment.
+This allows handling attachments of larger sizes without needing the `Mail.ReadWrite` permission.
+
+### With Application Permissions
+
+If it is wished to run this library with application level permissions, the field `RedirectUri` is not needed and
+`Delegated` should be set to `false`. The needed Permission in that case are `Mail.ReadWrite` and `Mail.Send` (type
+Application). Note that with application level permissions mails can be sent as any user in the tenant. The Permission
+`Mail.ReadWrite` is additionally needed because of the way attachments are done in Outlook, see the Microsoft
+documentation [here](https://learn.microsoft.com/en-us/graph/outlook-large-attachments?tabs=http) for more details.
+
+### With Delegated Permission
+
+Using this library on behalf of a user necessitates authentication of that user. The authentication is done on the basis
+of
+the [OAuth 2.0 authorization code grant flow](https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-auth-code-flow)
+as described by Microsoft. The persmissions needed are `Mail.ReadWrite`, `Mail.Send`, `User.Read` and `offline_access`
+(type Delegated). In order for the authentication process to work a browser needs to be installed. Furthermore a
+redirect uri must be defined and set in the `appsettings.json` as well as in the app registration. This redirect uri
+should point towards your application where the authorization code can be handed to the
+`InitializeGraphClientViaAuthCode()` function defined in `MsGraphDelegatedMailClient`. This is the `IMailClient` which
+is registered via `AddMsGraphMailClient()` when `Delegated` is `true` in the `appsettings.json`.
