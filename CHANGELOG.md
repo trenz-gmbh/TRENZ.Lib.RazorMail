@@ -1,3 +1,7 @@
+# 2.4.1
+
+- Fixes publish TRENZ.Lib.RazorMail.MicrosoftGraph to NuGet
+
 # 2.4.0
 
 - Added support for the Microsoft Graph API

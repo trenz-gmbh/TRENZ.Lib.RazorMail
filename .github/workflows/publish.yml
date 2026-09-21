@@ -28,6 +28,8 @@ jobs:
       run: dotnet nuget push TRENZ.Lib.RazorMail.MailKit/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
     - name: Publish NuGet Package
       run: dotnet nuget push TRENZ.Lib.RazorMail.SystemNet/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+    - name: Publish NuGet Package
+      run: dotnet nuget push TRENZ.Lib.RazorMail.MicrosoftGraph/bin/Release/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
     - name: Publish GitHub Release
       uses: softprops/action-gh-release@v3
       with:
