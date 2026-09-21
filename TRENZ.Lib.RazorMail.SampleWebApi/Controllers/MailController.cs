@@ -15,14 +15,16 @@ public class MailController(
 )
     : ControllerBase
 {
-    [HttpPost]
-    public async Task<IActionResult> SendWithSystemNet([FromBody] SendSampleMailRequest request,
-        [FromKeyedServices("System.Net.Mail")] IMailClient client)
+    [HttpGet]
+    public async Task<IActionResult> AuthcodeReceiver([FromQuery(Name = "code")] string authcode,
+        [FromKeyedServices("MsGraph")] IMailClient client)
     {
-        var message = await MakeMessage(request);
+        if (client is not MsGraphDelegatedMailClient mailClient)
+        {
+            return BadRequest("RazorMail MsGraph is not in delegated mode");
+        }
 
-        await client.SendAsync(message);
-
+        await mailClient.InitializeGraphClientViaAuthCode(authcode);
         return Ok();
     }
 
@@ -69,16 +71,14 @@ public class MailController(
         }
     }
 
-    [HttpGet]
-    public async Task<IActionResult> AuthcodeReceiver([FromQuery(Name = "code")] string authcode,
-        [FromKeyedServices("MsGraph")] IMailClient client)
+    [HttpPost]
+    public async Task<IActionResult> SendWithSystemNet([FromBody] SendSampleMailRequest request,
+        [FromKeyedServices("System.Net.Mail")] IMailClient client)
     {
-        if (client is not MsGraphDelegatedMailClient mailClient)
-        {
-            return BadRequest("RazorMail MsGraph is not in delegated mode");
-        }
+        var message = await MakeMessage(request);
 
-        await mailClient.InitializeGraphClientViaAuthCode(authcode);
+        await client.SendAsync(message);
+
         return Ok();
     }
 

@@ -14,4 +14,15 @@ public static class MailAddressExtensions
             Address = address.Email
         };
     }
+
+    public static List<Recipient> ToMsRecipients(this IEnumerable<MailAddress> addresses)
+    {
+        return
+        [
+            .. addresses.Select(mailAdress => new Recipient()
+            {
+                EmailAddress = mailAdress.ToMsEmailAddress()
+            })
+        ];
+    }
 }
