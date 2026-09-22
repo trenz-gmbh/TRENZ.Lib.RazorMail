@@ -22,6 +22,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\TRENZ.Lib.RazorMail.Core\TRENZ.Lib.RazorMail.Core.csproj" />
+        <ProjectReference Include="..\TRENZ.Lib.RazorMail.MailKit\TRENZ.Lib.RazorMail.MailKit.csproj" />
+        <ProjectReference Include="..\TRENZ.Lib.RazorMail.SystemNet\TRENZ.Lib.RazorMail.SystemNet.csproj" />
     </ItemGroup>
 
 </Project>
