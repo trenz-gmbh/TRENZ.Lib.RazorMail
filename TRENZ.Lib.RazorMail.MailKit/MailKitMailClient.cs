@@ -22,14 +22,36 @@ namespace TRENZ.Lib.RazorMail.MailKit;
 public class MailKitMailClient(IOptions<SmtpAccount> accountOptions, ILogger<MailKitMailClient> logger)
     : BaseSmtpMailClient(accountOptions)
 {
+    /// <summary>
+    /// Creates a new, unconnected <see cref="SmtpClient"/>.
+    /// </summary>
+    /// <remarks>
+    /// Override this to supply a pre-configured or test double <see cref="SmtpClient"/>.
+    /// The returned instance is owned by this class and gets disposed by it.
+    /// </remarks>
+    /// <returns>A new <see cref="SmtpClient"/> instance.</returns>
+    [MustDisposeResource]
+    protected virtual SmtpClient CreateSmtpClient() => new();
+
     [MustDisposeResource]
     private async Task<SmtpClient> CreateClientAsync(CancellationToken cancellationToken)
     {
-        var client = new SmtpClient();
+        var client = CreateSmtpClient();
 
-        await client.ConnectAsync(Account.Host, Account.Port, SecureSocketOptions.Auto, cancellationToken);
+        try
+        {
+            await client.ConnectAsync(Account.Host, Account.Port, SecureSocketOptions.Auto, cancellationToken);
 
-        await client.AuthenticateAsync(Account.Login, Account.Password, cancellationToken);
+            await client.AuthenticateAsync(Account.Login, Account.Password, cancellationToken);
+        }
+        catch
+        {
+            // the client may already hold an open socket, so release it eagerly instead
+            // of leaving an orphaned connection around until the finalizer runs
+            client.Dispose();
+
+            throw;
+        }
 
         return client;
     }
