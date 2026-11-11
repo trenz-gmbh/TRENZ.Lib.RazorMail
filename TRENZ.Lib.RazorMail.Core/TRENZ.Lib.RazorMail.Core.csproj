@@ -10,13 +10,6 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
-
     <PropertyGroup Condition="$(Configuration) == 'Release'">
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     </PropertyGroup>

@@ -62,12 +62,12 @@ public class RazorMailRendererTests
 
         var content = await renderer.RenderAsync(viewName, model);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(content.Subject, Is.Null);
             Assert.That(content.HtmlBody, Is.Empty);
             Assert.That(content.Attachments, Is.Not.Null);
-        });
+        }
 
         Assert.That(content.Attachments, Is.Empty);
     }

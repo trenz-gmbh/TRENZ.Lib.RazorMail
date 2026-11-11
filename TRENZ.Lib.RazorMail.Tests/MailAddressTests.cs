@@ -25,11 +25,11 @@ public class MailAddressTests
     {
         var address = new MailAddress(_EXPECTED_ADDRESS, _EXPECTED_NAME);
         
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(address.Email, Is.EqualTo(_EXPECTED_ADDRESS));
             Assert.That(address.Name, Is.EqualTo(_EXPECTED_NAME));
-        });
+        }
     }
 
     [Test]
