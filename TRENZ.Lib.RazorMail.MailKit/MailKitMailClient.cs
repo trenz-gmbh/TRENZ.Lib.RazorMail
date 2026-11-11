@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using JetBrains.Annotations;
 
-using global::MailKit;
+using MailKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 
