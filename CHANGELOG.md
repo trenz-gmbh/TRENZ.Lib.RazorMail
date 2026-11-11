@@ -1,3 +1,15 @@
+# Unreleased
+
+- Changed target frameworks from .NET 8 to .NET 10 and .NET 11
+- Updated MailKit to 5.0.0, Microsoft.Graph to 6.10.0, and test dependencies
+- Updated the required SDK to .NET 11.0.100 with patch roll-forward and automatic `global.json` discovery
+- Removed explicit Microsoft.SourceLink.GitHub package references
+
+# 2.4.2
+
+- Fixed Microsoft Graph NuGet package generation for Release builds [#49](https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail/pull/49)
+- Bumped the package version to publish the packaging fix to NuGet [#50](https://github.com/trenz-gmbh/TRENZ.Lib.RazorMail/pull/50)
+
 # 2.4.1
 
 - Fixes publish TRENZ.Lib.RazorMail.MicrosoftGraph to NuGet
