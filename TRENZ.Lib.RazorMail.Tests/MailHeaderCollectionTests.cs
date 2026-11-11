@@ -59,7 +59,7 @@ public class MailHeaderCollectionTests
 
         collection.AppendRange(secondCollection);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(collection.From, Is.EqualTo(me));
             Assert.That(collection.Recipients, Is.EquivalentTo(new [] { you, you2 }));
@@ -67,7 +67,7 @@ public class MailHeaderCollectionTests
             Assert.That(collection.BlindCarbonCopy, Is.EquivalentTo(new [] { brad, brad2 }));
             Assert.That(collection.ReplyTo, Is.EquivalentTo(new [] { charlie, charlie2 }));
             Assert.That(collection["Custom"], Is.EqualTo("Value"));
-        });
+        }
     }
 
     [Test]
@@ -107,7 +107,7 @@ public class MailHeaderCollectionTests
 
         collection.OverwriteWith(secondCollection);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(collection.From, Is.EqualTo(me2));
             Assert.That(collection.Recipients, Is.EquivalentTo(new [] { you2 }));
@@ -115,7 +115,7 @@ public class MailHeaderCollectionTests
             Assert.That(collection.BlindCarbonCopy, Is.EquivalentTo(new [] { brad2 }));
             Assert.That(collection.ReplyTo, Is.EquivalentTo(new [] { charlie2 }));
             Assert.That(collection["Custom"], Is.EqualTo("New Value"));
-        });
+        }
     }
 
     [Test]
